@@ -1,0 +1,154 @@
+<%- include('partials/header') %>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+    :root {
+        --bg:#07070f; --bg-1:#0e0e1c; --bg-2:#13132a;
+        --indigo:#4f46e5; --violet:#7c3aed; --il:#818cf8; --iv:#a78bfa;
+        --text:#eeeeff; --muted:#7a7a9a; --border:rgba(255,255,255,0.065); --red:#ef4444;
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); }
+    a { text-decoration:none; }
+
+    .page-wrap { max-width:1100px; margin:0 auto; padding:36px 28px 100px; }
+
+    .page-top {
+        display:flex; align-items:flex-end; justify-content:space-between;
+        flex-wrap:wrap; gap:16px; margin-bottom:32px;
+    }
+    .page-top h1 {
+        font-family:'Sora',sans-serif; font-size:clamp(1.5rem,2.5vw,2rem);
+        font-weight:800; letter-spacing:-0.8px;
+    }
+    .page-top h1 span {
+        background:linear-gradient(120deg,var(--il),var(--iv));
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .page-sub { font-size:0.86rem; color:var(--muted); margin-top:4px; }
+
+    .btn-new {
+        display:inline-flex; align-items:center; gap:8px;
+        background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff;
+        font-family:'Sora',sans-serif; font-size:0.85rem; font-weight:700;
+        padding:10px 22px; border-radius:10px; border:none;
+        box-shadow:0 0 24px rgba(79,70,229,0.35); transition:all .25s; cursor:pointer;
+    }
+    .btn-new:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(79,70,229,0.5); color:#fff; }
+
+    /* day groups */
+    .day-order { display:flex; flex-direction:column; gap:10px; }
+
+    /* day-of-week map */
+    .day-icons { Monday:'🌅'; Tuesday:'☀️'; Wednesday:'🌤️'; Thursday:'⛅'; Friday:'🎉'; Saturday:'🌟'; Sunday:'🌙'; }
+
+    .slot-card {
+        background:var(--bg-1); border:1px solid var(--border); border-radius:16px;
+        padding:18px 22px; display:flex; align-items:center; gap:16px;
+        transition:border-color .25s, transform .2s;
+    }
+    .slot-card:hover { border-color:rgba(99,102,241,0.2); transform:translateX(4px); }
+
+    .slot-day-badge {
+        min-width:100px; background:linear-gradient(135deg,rgba(79,70,229,0.14),rgba(124,58,237,0.09));
+        border:1px solid rgba(99,102,241,0.22); border-radius:10px;
+        padding:10px 14px; text-align:center; flex-shrink:0;
+    }
+    .slot-day-badge .day-name {
+        font-family:'Sora',sans-serif; font-size:0.82rem; font-weight:700; color:var(--il);
+    }
+
+    .slot-time {
+        flex:1; display:flex; align-items:center; gap:10px;
+    }
+
+    .time-range {
+        display:flex; align-items:center; gap:8px;
+    }
+
+    .time-chip {
+        background:var(--bg-2); border:1px solid var(--border); border-radius:8px;
+        padding:6px 12px; font-family:'Sora',sans-serif; font-size:0.88rem;
+        font-weight:700; color:var(--text);
+    }
+
+    .time-sep { color:var(--muted); font-size:0.8rem; }
+
+    .slot-card form { margin:0; margin-left:auto; }
+
+    .btn-delete {
+        display:inline-flex; align-items:center; gap:6px;
+        background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.15);
+        color:#f87171; font-size:0.76rem; font-weight:700;
+        padding:7px 14px; border-radius:8px; cursor:pointer; transition:all .2s;
+        white-space:nowrap;
+    }
+    .btn-delete:hover { background:rgba(239,68,68,0.16); border-color:rgba(239,68,68,0.28); }
+
+    /* Availability grid for a week overview */
+    .slots-grid {
+        display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px;
+    }
+
+    /* empty */
+    .empty-wrap {
+        display:flex; flex-direction:column; align-items:center;
+        justify-content:center; padding:80px 20px; text-align:center; gap:16px;
+    }
+    .empty-icon-big {
+        width:64px; height:64px; border-radius:18px;
+        background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.18);
+        display:flex; align-items:center; justify-content:center; font-size:1.8rem;
+    }
+    .empty-wrap h3 { font-family:'Sora',sans-serif; font-size:1.05rem; font-weight:700; color:var(--text); }
+    .empty-wrap p  { font-size:0.86rem; color:var(--muted); max-width:280px; line-height:1.6; }
+
+    @media(max-width:640px){
+        .page-wrap{padding:22px 14px 80px;}
+        .slot-day-badge{min-width:80px;}
+        .time-chip{font-size:.78rem;}
+    }
+</style>
+
+<div class="page-wrap">
+    <div class="page-top">
+        <div>
+            <h1>My <span>Availability</span></h1>
+            <p class="page-sub">Time slots when you're available for skill exchanges.</p>
+        </div>
+        <a href="/availability/add" class="btn-new"><i class="bi bi-plus-lg"></i> Add Time Slot</a>
+    </div>
+
+    <% if (locals.availability && availability.length > 0) { %>
+        <div class="slots-grid">
+            <% availability.forEach(slot => { %>
+                <div class="slot-card">
+                    <div class="slot-day-badge">
+                        <div class="day-name"><%= slot.day %></div>
+                    </div>
+                    <div class="slot-time">
+                        <div class="time-range">
+                            <span class="time-chip"><%= slot.start_time %></span>
+                            <span class="time-sep">→</span>
+                            <span class="time-chip"><%= slot.end_time %></span>
+                        </div>
+                    </div>
+                    <form action="/availability/delete/<%= slot.availability_id %>" method="POST">
+                        <button type="submit" class="btn-delete" onclick="return confirm('Delete this time slot?')">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </form>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <div class="empty-wrap">
+            <div class="empty-icon-big">📅</div>
+            <h3>No availability set</h3>
+            <p>Add your available time slots so others know when they can exchange skills with you.</p>
+            <a href="/availability/add" class="btn-new"><i class="bi bi-plus-lg"></i> Add Your First Time Slot</a>
+        </div>
+    <% } %>
+</div>
+
+<%- include('partials/footer') %>

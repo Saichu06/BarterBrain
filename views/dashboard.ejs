@@ -1,0 +1,821 @@
+<%- include('partials/header') %>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+    :root {
+        --bg:     #07070f;
+        --bg-1:   #0e0e1c;
+        --bg-2:   #13132a;
+        --bg-3:   #1a1a30;
+        --indigo: #4f46e5;
+        --violet: #7c3aed;
+        --il:     #818cf8;
+        --iv:     #a78bfa;
+        --text:   #eeeeff;
+        --muted:  #7a7a9a;
+        --border: rgba(255,255,255,0.065);
+        --bh:     rgba(99,102,241,0.35);
+        --green:  #10b981;
+        --amber:  #f59e0b;
+        --blue:   #3b82f6;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'DM Sans', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+    }
+
+    a { text-decoration: none; }
+
+    /* PAGE WRAPPER */
+    .dash-page {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 36px 28px 100px;
+    }
+
+    /* TOP ROW */
+    .dash-top {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+
+    .dash-greeting {
+        font-family: 'Sora', sans-serif;
+        font-size: clamp(1.5rem, 2.5vw, 2.15rem);
+        font-weight: 800;
+        letter-spacing: -1px;
+        line-height: 1.2;
+    }
+
+    .dash-greeting .name {
+        background: linear-gradient(120deg, #818cf8, #a78bfa, #c084fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .dash-sub { font-size: 0.87rem; color: var(--muted); margin-top: 5px; }
+
+    .dash-date {
+        font-size: 0.8rem;
+        color: var(--muted);
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        padding: 7px 16px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+    }
+
+    .dash-date i { color: var(--il); }
+
+    /* HERO BANNER */
+    .hero-banner {
+        position: relative;
+        overflow: hidden;
+        border-radius: 22px;
+        background: linear-gradient(135deg, #1b1640 0%, #200e4a 55%, #130d2e 100%);
+        border: 1px solid rgba(99,102,241,0.22);
+        margin-bottom: 26px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+    }
+
+    .hero-banner::before {
+        content: '';
+        position: absolute;
+        width: 480px; height: 480px;
+        background: radial-gradient(circle, rgba(124,58,237,0.22), transparent 65%);
+        top: -160px; right: -80px;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .hero-banner::after {
+        content: '';
+        position: absolute;
+        width: 280px; height: 280px;
+        background: radial-gradient(circle, rgba(79,70,229,0.18), transparent 65%);
+        bottom: -90px; left: 60px;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .hero-left {
+        padding: 36px 40px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #a5b4fc;
+        background: rgba(99,102,241,0.12);
+        border: 1px solid rgba(99,102,241,0.2);
+        padding: 4px 12px;
+        border-radius: 100px;
+        margin-bottom: 16px;
+    }
+
+    .hero-eyebrow .dot {
+        width: 6px; height: 6px;
+        background: #818cf8;
+        border-radius: 50%;
+        animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    .hero-left h2 {
+        font-family: 'Sora', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #ddd6fe;
+        margin-bottom: 4px;
+    }
+
+    .hero-left p { font-size: 0.8rem; color: rgba(165,180,252,0.5); margin-bottom: 20px; }
+
+    .score-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+
+    .score {
+        font-family: 'Sora', sans-serif;
+        font-size: 3.5rem;
+        font-weight: 800;
+        letter-spacing: -3px;
+        line-height: 1;
+        background: linear-gradient(120deg, #e0e7ff, #c4b5fd, #a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .score-denom { font-size: 1rem; color: rgba(165,180,252,0.45); font-weight: 500; }
+
+    .star-row { display: flex; gap: 4px; margin-top: 6px; }
+    .star-row i { color: #fbbf24; font-size: 0.9rem; }
+    .star-row i.dim { color: rgba(251,191,36,0.2); }
+
+    /* Hero right stats strip */
+    .hero-stats {
+        display: flex;
+        flex-direction: column;
+        border-left: 1px solid rgba(255,255,255,0.06);
+        position: relative;
+        z-index: 1;
+    }
+
+    .hsi {
+        flex: 1;
+        padding: 22px 34px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 168px;
+    }
+
+    .hsi:last-child { border-bottom: none; }
+
+    .hsi-val {
+        font-family: 'Sora', sans-serif;
+        font-size: 1.65rem;
+        font-weight: 800;
+        letter-spacing: -0.8px;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+
+    .hsi-lbl {
+        font-size: 0.73rem;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .hsi-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+    /* QUICK ACTIONS */
+    .qa-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 32px;
+    }
+
+    .act-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 20px 20px 18px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: var(--bg-1);
+        color: var(--text);
+        transition: all 0.25s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .act-btn:hover {
+        border-color: var(--bh);
+        transform: translateY(-3px);
+        box-shadow: 0 14px 36px rgba(79,70,229,0.18);
+        color: var(--text);
+    }
+
+    .act-btn.hl {
+        background: linear-gradient(135deg, rgba(79,70,229,0.14), rgba(124,58,237,0.08));
+        border-color: rgba(99,102,241,0.26);
+    }
+
+    .act-btn.hl:hover { box-shadow: 0 14px 36px rgba(79,70,229,0.28); }
+
+    .act-icon {
+        width: 40px; height: 40px;
+        border-radius: 11px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .act-icon.c-indigo { background: rgba(79,70,229,0.18); }
+    .act-icon.c-violet { background: rgba(124,58,237,0.18); }
+    .act-icon.c-green  { background: rgba(16,185,129,0.15); }
+    .act-icon.c-amber  { background: rgba(245,158,11,0.15); }
+
+    .act-text strong {
+        display: block;
+        font-family: 'Sora', sans-serif;
+        font-size: 0.87rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 3px;
+    }
+
+    .act-text span { font-size: 0.74rem; color: var(--muted); line-height: 1.4; }
+
+    .act-arrow {
+        position: absolute;
+        top: 18px; right: 18px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        opacity: 0;
+        transform: translateX(-4px);
+        transition: all 0.2s;
+    }
+
+    .act-btn:hover .act-arrow { opacity: 1; transform: translateX(0); }
+
+    /* THREE SECTION GRID */
+    .sections-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+
+    .sec-card {
+        background: var(--bg-1);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        transition: border-color 0.25s;
+    }
+
+    .sec-card:hover { border-color: rgba(99,102,241,0.2); }
+
+    .sec-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+
+    .sec-title-wrap { display: flex; align-items: center; gap: 9px; }
+
+    .sec-icon {
+        width: 30px; height: 30px;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.85rem;
+    }
+
+    .sec-icon.c-indigo { background: rgba(79,70,229,0.15); }
+    .sec-icon.c-green  { background: rgba(16,185,129,0.15); }
+    .sec-icon.c-violet { background: rgba(124,58,237,0.15); }
+
+    .sec-head h2 {
+        font-family: 'Sora', sans-serif;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.2px;
+    }
+
+    .sec-count {
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 100px;
+        background: rgba(99,102,241,0.1);
+        border: 1px solid rgba(99,102,241,0.18);
+        color: var(--il);
+    }
+
+    /* item list */
+    .item-list {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-height: 90px;
+    }
+
+    .item-card {
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: 11px;
+        padding: 12px 14px;
+        transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .item-card:hover {
+        border-color: rgba(99,102,241,0.22);
+        transform: translateX(3px);
+        box-shadow: -3px 0 0 rgba(99,102,241,0.4);
+    }
+
+    .item-card h4 {
+        font-family: 'Sora', sans-serif;
+        font-size: 0.83rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 4px;
+    }
+
+    .item-card p {
+        font-size: 0.76rem;
+        color: var(--muted);
+        line-height: 1.5;
+        margin-bottom: 6px;
+    }
+
+    .item-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .item-card small {
+        font-size: 0.68rem;
+        color: rgba(122,122,154,0.65);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Status badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 9px;
+        border-radius: 100px;
+        font-size: 0.67rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: capitalize;
+    }
+
+    .status-badge::before {
+        content: '';
+        width: 5px; height: 5px;
+        border-radius: 50%;
+    }
+
+    .status-badge.pending {
+        background: rgba(245,158,11,0.1);
+        color: #fbbf24;
+        border: 1px solid rgba(245,158,11,0.22);
+    }
+    .status-badge.pending::before { background: #fbbf24; box-shadow: 0 0 4px #fbbf24; }
+
+    .status-badge.accepted {
+        background: rgba(16,185,129,0.1);
+        color: #34d399;
+        border: 1px solid rgba(16,185,129,0.22);
+    }
+    .status-badge.accepted::before { background: #34d399; }
+
+    .status-badge.completed {
+        background: rgba(59,130,246,0.1);
+        color: #60a5fa;
+        border: 1px solid rgba(59,130,246,0.18);
+    }
+    .status-badge.completed::before { background: #60a5fa; }
+
+    /* view all */
+    .view-all {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 14px;
+        color: var(--il);
+        font-size: 0.78rem;
+        font-weight: 600;
+        transition: gap 0.2s, color 0.2s;
+        align-self: flex-start;
+    }
+    .view-all:hover { color: var(--iv); gap: 8px; }
+
+    /* empty state */
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 28px 12px;
+        text-align: center;
+        gap: 8px;
+        flex: 1;
+    }
+
+    .empty-icon {
+        width: 42px; height: 42px;
+        border-radius: 11px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem;
+        opacity: 0.5;
+        margin-bottom: 2px;
+    }
+
+    .empty-state p { font-size: 0.78rem; color: var(--muted); max-width: 155px; line-height: 1.5; }
+
+    /* Skeleton */
+    @keyframes shimmer {
+        0%   { background-position: -600px 0; }
+        100% { background-position:  600px 0; }
+    }
+
+    .skel {
+        background: linear-gradient(90deg,
+            rgba(255,255,255,0.03) 25%,
+            rgba(255,255,255,0.07) 50%,
+            rgba(255,255,255,0.03) 75%);
+        background-size: 1200px 100%;
+        animation: shimmer 1.6s infinite;
+        border-radius: 5px;
+    }
+
+    .skel-card {
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: 11px;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .sk-h  { height: 12px; width: 52%; }
+    .sk-b  { height: 10px; width: 78%; }
+    .sk-s  { height: 9px;  width: 36%; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .action-grid { grid-template-columns: repeat(2,1fr); }
+        .sections-grid { grid-template-columns: 1fr 1fr; }
+        .hero-stats { display: none; }
+        .hero-banner { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+        .dash-page { padding: 22px 14px 80px; }
+        .action-grid { grid-template-columns: 1fr 1fr; }
+        .sections-grid { grid-template-columns: 1fr; }
+        .hero-left { padding: 26px 22px; }
+        .score { font-size: 2.8rem; }
+    }
+</style>
+
+<div class="dash-page">
+
+    <!-- TOP ROW -->
+    <div class="dash-top">
+        <div>
+            <div class="dash-greeting">Good day, <span class="name"><%= user.name %>! 👋</span></div>
+            <p class="dash-sub">Here's an overview of your skill exchange activity.</p>
+        </div>
+        <div class="dash-date">
+            <i class="bi bi-calendar3"></i>
+            <span id="live-date">—</span>
+        </div>
+    </div>
+
+    <!-- HERO BANNER -->
+    <div class="hero-banner">
+        <div class="hero-left">
+            <div class="hero-eyebrow"><span class="dot"></span> Reputation</div>
+            <h2>Your Community Score</h2>
+            <p>Earned through completed skill exchanges</p>
+            <div class="score-row">
+                <div class="score" id="reputation">—</div>
+                <div class="score-denom">/ 5.0</div>
+            </div>
+            <div class="star-row" id="star-row">
+                <i class="bi bi-star-fill dim"></i>
+                <i class="bi bi-star-fill dim"></i>
+                <i class="bi bi-star-fill dim"></i>
+                <i class="bi bi-star-fill dim"></i>
+                <i class="bi bi-star-fill dim"></i>
+            </div>
+        </div>
+        <div class="hero-stats">
+            <div class="hsi">
+                <div class="hsi-val" id="stat-offers">—</div>
+                <div class="hsi-lbl"><span class="hsi-dot" style="background:var(--il);"></span> Active Offers</div>
+            </div>
+            <div class="hsi">
+                <div class="hsi-val" id="stat-requests">—</div>
+                <div class="hsi-lbl"><span class="hsi-dot" style="background:var(--green);"></span> Open Requests</div>
+            </div>
+            <div class="hsi">
+                <div class="hsi-val" id="stat-matches">—</div>
+                <div class="hsi-lbl"><span class="hsi-dot" style="background:var(--amber);"></span> Pending Matches</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <span class="qa-label">Quick Actions</span>
+    <div class="action-grid">
+        <a href="/offers/new" class="act-btn hl">
+            <div class="act-icon c-indigo">➕</div>
+            <div class="act-text">
+                <strong>Add Skill Offer</strong>
+                <span>Share what you can teach</span>
+            </div>
+            <i class="bi bi-arrow-right act-arrow"></i>
+        </a>
+        <a href="/requests/new" class="act-btn hl">
+            <div class="act-icon c-violet">📝</div>
+            <div class="act-text">
+                <strong>Request a Skill</strong>
+                <span>Post what you want to learn</span>
+            </div>
+            <i class="bi bi-arrow-right act-arrow"></i>
+        </a>
+        <a href="/matches/potential" class="act-btn">
+            <div class="act-icon c-green">🔍</div>
+            <div class="act-text">
+                <strong>Find Matches</strong>
+                <span>Discover compatible learners</span>
+            </div>
+            <i class="bi bi-arrow-right act-arrow"></i>
+        </a>
+        <a href="/availability/add" class="act-btn">
+            <div class="act-icon c-amber">📅</div>
+            <div class="act-text">
+                <strong>Set Availability</strong>
+                <span>Let others know when you're free</span>
+            </div>
+            <i class="bi bi-arrow-right act-arrow"></i>
+        </a>
+    </div>
+
+    <!-- THREE SECTIONS -->
+    <div class="sections-grid">
+
+        <div class="sec-card">
+            <div class="sec-head">
+                <div class="sec-title-wrap">
+                    <div class="sec-icon c-indigo">💼</div>
+                    <h2>Recent Offers</h2>
+                </div>
+                <span class="sec-count" id="offers-count">—</span>
+            </div>
+            <div class="item-list" id="recent-offers">
+                <div class="skel-card"><div class="skel sk-h"></div><div class="skel sk-b"></div><div class="skel sk-s"></div></div>
+                <div class="skel-card"><div class="skel sk-h"></div><div class="skel sk-b"></div><div class="skel sk-s"></div></div>
+            </div>
+            <a href="/offers" class="view-all">View all offers <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        <div class="sec-card">
+            <div class="sec-head">
+                <div class="sec-title-wrap">
+                    <div class="sec-icon c-green">📋</div>
+                    <h2>Recent Requests</h2>
+                </div>
+                <span class="sec-count" id="requests-count">—</span>
+            </div>
+            <div class="item-list" id="recent-requests">
+                <div class="skel-card"><div class="skel sk-h"></div><div class="skel sk-b"></div><div class="skel sk-s"></div></div>
+                <div class="skel-card"><div class="skel sk-h"></div><div class="skel sk-b"></div><div class="skel sk-s"></div></div>
+            </div>
+            <a href="/requests" class="view-all">View all requests <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        <div class="sec-card">
+            <div class="sec-head">
+                <div class="sec-title-wrap">
+                    <div class="sec-icon c-violet">⚡</div>
+                    <h2>Pending Matches</h2>
+                </div>
+                <span class="sec-count" id="matches-count">—</span>
+            </div>
+            <div class="item-list" id="pending-matches">
+                <div class="skel-card"><div class="skel sk-h"></div><div class="skel sk-b"></div><div class="skel sk-s"></div></div>
+                <div class="skel-card"><div class="skel sk-h"></div><div class="skel sk-b"></div><div class="skel sk-s"></div></div>
+            </div>
+            <a href="/matches" class="view-all">View all matches <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Live date
+    (function () {
+        const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('live-date').textContent = new Date().toLocaleDateString(undefined, opts);
+    })();
+
+    // Stars
+    function renderStars(score) {
+        const row = document.getElementById('star-row');
+        row.innerHTML = '';
+        for (let i = 1; i <= 5; i++) {
+            const ic = document.createElement('i');
+            if (score >= i)         { ic.className = 'bi bi-star-fill'; ic.style.color = '#fbbf24'; }
+            else if (score >= i-.5) { ic.className = 'bi bi-star-half'; ic.style.color = '#fbbf24'; }
+            else                    { ic.className = 'bi bi-star-fill dim'; }
+            row.appendChild(ic);
+        }
+    }
+
+    function emptyHTML(icon, msg) {
+        return `<div class="empty-state"><div class="empty-icon">${icon}</div><p>${msg}</p></div>`;
+    }
+
+    function errorHTML(msg) {
+        return `<div class="empty-state"><div class="empty-icon" style="opacity:.35;">⚠️</div><p style="color:#f87171;">${msg}</p></div>`;
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDashboardData);
+
+    async function loadDashboardData() {
+        console.log('Loading dashboard data...');
+
+        // Reputation
+        try {
+            console.log('Fetching reputation...');
+            const repResponse = await fetch('/api/user/reputation');
+            console.log('Reputation response:', repResponse);
+            if (repResponse.ok) {
+                const repData = await repResponse.json();
+                console.log('Reputation data received:', repData);
+                let score = 0;
+                if (typeof repData.score === 'string') score = parseFloat(repData.score);
+                else if (typeof repData.score === 'number') score = repData.score;
+                document.getElementById('reputation').textContent = score.toFixed(2);
+                renderStars(score);
+            } else {
+                document.getElementById('reputation').textContent = '0.00';
+                renderStars(0);
+                console.error('Failed to fetch reputation:', repResponse.status);
+            }
+        } catch (error) {
+            console.error('Error loading reputation:', error);
+            document.getElementById('reputation').textContent = '0.00';
+            renderStars(0);
+        }
+
+        // Recent Offers
+        try {
+            console.log('Fetching recent offers...');
+            const offersResponse = await fetch('/api/user/recent-offers');
+            if (offersResponse.ok) {
+                const offers = await offersResponse.json();
+                console.log('Offers received:', offers);
+                if (offers && offers.length > 0) {
+                    document.getElementById('offers-count').textContent = offers.length;
+                    document.getElementById('stat-offers').textContent  = offers.length;
+                    document.getElementById('recent-offers').innerHTML  = offers.map(o => `
+                        <div class="item-card">
+                            <h4>${o.skill_name || 'Unknown Skill'}</h4>
+                            <p>${o.description ? o.description.substring(0,65) + (o.description.length > 65 ? '…' : '') : 'No description'}</p>
+                            <div class="item-footer">
+                                <small><i class="bi bi-calendar3"></i> ${new Date(o.created_at).toLocaleDateString()}</small>
+                            </div>
+                        </div>`).join('');
+                } else {
+                    document.getElementById('offers-count').textContent = '0';
+                    document.getElementById('stat-offers').textContent  = '0';
+                    document.getElementById('recent-offers').innerHTML  = emptyHTML('💼', 'No offers yet — add your first skill!');
+                }
+            } else {
+                document.getElementById('recent-offers').innerHTML = errorHTML('Failed to load offers');
+            }
+        } catch (error) {
+            console.error('Error loading offers:', error);
+            document.getElementById('recent-offers').innerHTML = errorHTML('Error loading offers');
+        }
+
+        // Recent Requests
+        try {
+            console.log('Fetching recent requests...');
+            const requestsResponse = await fetch('/api/user/recent-requests');
+            if (requestsResponse.ok) {
+                const requests = await requestsResponse.json();
+                console.log('Requests received:', requests);
+                if (requests && requests.length > 0) {
+                    document.getElementById('requests-count').textContent = requests.length;
+                    document.getElementById('stat-requests').textContent  = requests.length;
+                    document.getElementById('recent-requests').innerHTML  = requests.map(r => `
+                        <div class="item-card">
+                            <h4>${r.skill_name || 'Unknown Skill'}</h4>
+                            <p>${r.description ? r.description.substring(0,65) + (r.description.length > 65 ? '…' : '') : 'No description'}</p>
+                            <div class="item-footer">
+                                <small><i class="bi bi-calendar3"></i> ${new Date(r.created_at).toLocaleDateString()}</small>
+                            </div>
+                        </div>`).join('');
+                } else {
+                    document.getElementById('requests-count').textContent = '0';
+                    document.getElementById('stat-requests').textContent  = '0';
+                    document.getElementById('recent-requests').innerHTML  = emptyHTML('📋', 'No requests yet — tell us what you want to learn!');
+                }
+            } else {
+                document.getElementById('recent-requests').innerHTML = errorHTML('Failed to load requests');
+            }
+        } catch (error) {
+            console.error('Error loading requests:', error);
+            document.getElementById('recent-requests').innerHTML = errorHTML('Error loading requests');
+        }
+
+        // Pending Matches
+        try {
+            console.log('Fetching pending matches...');
+            const matchesResponse = await fetch('/api/user/pending-matches');
+            if (matchesResponse.ok) {
+                const matches = await matchesResponse.json();
+                console.log('Matches received:', matches);
+                if (matches && matches.length > 0) {
+                    document.getElementById('matches-count').textContent = matches.length;
+                    document.getElementById('stat-matches').textContent  = matches.length;
+                    document.getElementById('pending-matches').innerHTML = matches.map(m => `
+                        <div class="item-card">
+                            <h4>${m.skill_name || 'Unknown Skill'}</h4>
+                            <p><i class="bi bi-person" style="margin-right:4px;opacity:.4;"></i>With ${m.other_user || 'Unknown User'}</p>
+                            <div class="item-footer">
+                                <span class="status-badge ${m.status || 'pending'}">${m.status || 'pending'}</span>
+                            </div>
+                        </div>`).join('');
+                } else {
+                    document.getElementById('matches-count').textContent = '0';
+                    document.getElementById('stat-matches').textContent  = '0';
+                    document.getElementById('pending-matches').innerHTML = emptyHTML('⚡', 'No pending matches — go find some!');
+                }
+            } else {
+                document.getElementById('pending-matches').innerHTML = errorHTML('Failed to load matches');
+            }
+        } catch (error) {
+            console.error('Error loading matches:', error);
+            document.getElementById('pending-matches').innerHTML = errorHTML('Error loading matches');
+        }
+    }
+</script>
+
+<%- include('partials/footer') %>

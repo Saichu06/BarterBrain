@@ -1,0 +1,159 @@
+<%- include('partials/header') %>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+    :root {
+        --bg:#07070f; --bg-1:#0e0e1c; --bg-2:#13132a;
+        --indigo:#4f46e5; --violet:#7c3aed; --il:#818cf8; --iv:#a78bfa;
+        --text:#eeeeff; --muted:#7a7a9a; --border:rgba(255,255,255,0.065); --red:#ef4444;
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); }
+    a { text-decoration:none; }
+
+    .page-wrap { max-width:1200px; margin:0 auto; padding:36px 28px 100px; }
+
+    .page-top {
+        display:flex; align-items:flex-end; justify-content:space-between;
+        flex-wrap:wrap; gap:16px; margin-bottom:32px;
+    }
+    .page-top h1 {
+        font-family:'Sora',sans-serif; font-size:clamp(1.5rem,2.5vw,2rem);
+        font-weight:800; letter-spacing:-0.8px;
+    }
+    .page-top h1 span {
+        background:linear-gradient(120deg,var(--il),var(--iv));
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .page-sub { font-size:0.86rem; color:var(--muted); margin-top:4px; }
+
+    .btn-new {
+        display:inline-flex; align-items:center; gap:8px;
+        background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff;
+        font-family:'Sora',sans-serif; font-size:0.85rem; font-weight:700;
+        padding:10px 22px; border-radius:10px; border:none;
+        box-shadow:0 0 24px rgba(79,70,229,0.35); transition:all .25s; cursor:pointer;
+    }
+    .btn-new:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(79,70,229,0.5); color:#fff; }
+
+    .requests-grid {
+        display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px;
+    }
+
+    .request-card {
+        background:var(--bg-1); border:1px solid var(--border); border-radius:18px;
+        padding:22px; display:flex; flex-direction:column; gap:12px;
+        transition:border-color .25s, transform .25s, box-shadow .25s;
+        position:relative; overflow:hidden;
+    }
+    .request-card::before {
+        content:''; position:absolute; top:0; left:0; right:0; height:1px;
+        background:linear-gradient(90deg,transparent,rgba(16,185,129,0.4),transparent);
+        opacity:0; transition:opacity .25s;
+    }
+    .request-card:hover {
+        border-color:rgba(16,185,129,0.18); transform:translateY(-3px);
+        box-shadow:0 16px 40px rgba(0,0,0,0.35);
+    }
+    .request-card:hover::before { opacity:1; }
+
+    .card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+
+    .req-icon {
+        width:44px; height:44px; border-radius:12px; flex-shrink:0;
+        background:linear-gradient(135deg,rgba(16,185,129,0.16),rgba(5,150,105,0.1));
+        border:1px solid rgba(16,185,129,0.2); display:flex;
+        align-items:center; justify-content:center; font-size:1.2rem;
+    }
+
+    .cat-badge {
+        font-size:0.67rem; font-weight:700; padding:3px 10px; border-radius:100px;
+        background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.18);
+        color:#34d399; letter-spacing:.04em; white-space:nowrap;
+    }
+
+    .request-card h3 {
+        font-family:'Sora',sans-serif; font-size:0.97rem; font-weight:700;
+        color:var(--text); letter-spacing:-0.2px;
+    }
+
+    .request-card .desc {
+        font-size:0.8rem; color:var(--muted); line-height:1.6; flex:1;
+    }
+
+    .card-footer {
+        display:flex; align-items:center; justify-content:space-between;
+        flex-wrap:wrap; gap:8px; padding-top:4px;
+        border-top:1px solid var(--border);
+    }
+
+    .card-date {
+        font-size:0.7rem; color:rgba(122,122,154,0.6);
+        display:flex; align-items:center; gap:4px;
+    }
+
+    .delete-form { margin:0; }
+    .btn-delete {
+        display:inline-flex; align-items:center; gap:6px;
+        background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.16);
+        color:#f87171; font-size:0.76rem; font-weight:700;
+        padding:6px 14px; border-radius:8px; cursor:pointer; transition:all .2s;
+    }
+    .btn-delete:hover { background:rgba(239,68,68,0.16); border-color:rgba(239,68,68,0.28); }
+
+    .empty-wrap {
+        display:flex; flex-direction:column; align-items:center;
+        justify-content:center; padding:80px 20px; text-align:center; gap:16px;
+    }
+    .empty-icon-big {
+        width:64px; height:64px; border-radius:18px;
+        background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.18);
+        display:flex; align-items:center; justify-content:center; font-size:1.8rem;
+    }
+    .empty-wrap h3 { font-family:'Sora',sans-serif; font-size:1.05rem; font-weight:700; color:var(--text); }
+    .empty-wrap p  { font-size:0.86rem; color:var(--muted); max-width:280px; line-height:1.6; }
+
+    @media(max-width:640px){ .page-wrap{padding:22px 14px 80px;} }
+</style>
+
+<div class="page-wrap">
+    <div class="page-top">
+        <div>
+            <h1>My Skill <span>Requests</span></h1>
+            <p class="page-sub">Skills you're looking to learn from the community.</p>
+        </div>
+        <a href="/requests/new" class="btn-new"><i class="bi bi-plus-lg"></i> New Request</a>
+    </div>
+
+    <% if (locals.requests && requests.length > 0) { %>
+        <div class="requests-grid">
+            <% requests.forEach(request => { %>
+                <div class="request-card">
+                    <div class="card-top">
+                        <div class="req-icon">📋</div>
+                        <span class="cat-badge"><%= request.category_name || 'Uncategorized' %></span>
+                    </div>
+                    <h3><%= request.skill_name %></h3>
+                    <p class="desc"><%= request.description || 'No description provided' %></p>
+                    <div class="card-footer">
+                        <span class="card-date"><i class="bi bi-calendar3"></i> <%= new Date(request.created_at).toLocaleDateString() %></span>
+                        <form action="/requests/delete/<%= request.request_id %>" method="POST" class="delete-form">
+                            <button type="submit" class="btn-delete" onclick="return confirm('Are you sure?')">
+                                <i class="bi bi-trash3"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <div class="empty-wrap">
+            <div class="empty-icon-big">📋</div>
+            <h3>No requests yet</h3>
+            <p>Tell the community what you want to learn — create your first skill request!</p>
+            <a href="/requests/new" class="btn-new"><i class="bi bi-plus-lg"></i> Create Your First Request</a>
+        </div>
+    <% } %>
+</div>
+
+<%- include('partials/footer') %>

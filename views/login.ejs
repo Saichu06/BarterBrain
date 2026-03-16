@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BarterBrain</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-light: #f8faff;
+            --bg-card: #ffffff;
+            --bg-input: #f3f6fd;
+            --indigo: #4f46e5;
+            --violet: #7c3aed;
+            --indigo-light: #818cf8;
+            --text-main: #1a1f36;
+            --text-muted: #5b6b8c;
+            --text-light: #8b9bb5;
+            --border: #e2e8f0;
+            --border-focus: #4f46e5;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e6ecfe 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            padding: 20px 40px;
+            background: transparent;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+        }
+
+        .navbar-brand {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--indigo);
+        }
+
+        .nav-links .btn-outline {
+            border: 2px solid var(--indigo);
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: var(--indigo);
+            font-weight: 600;
+        }
+
+        .nav-links .btn-outline:hover {
+            background: var(--indigo);
+            color: white;
+        }
+
+        /* Main content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 40px 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            min-height: 100vh;
+            align-items: center;
+        }
+
+        /* Left side - Hero section */
+        .hero-section {
+            padding-right: 40px;
+        }
+
+        .hero-badge {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--indigo);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 24px;
+            border: 1px solid rgba(79, 70, 229, 0.2);
+        }
+
+        .hero-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -1px;
+            margin-bottom: 24px;
+            color: var(--text-main);
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 50px;
+        }
+
+        .stat-item {
+            text-align: left;
+        }
+
+        .stat-number {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--indigo);
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .feature-list {
+            margin-top: 40px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .feature-list li i {
+            color: var(--indigo);
+            font-size: 1.2rem;
+            background: rgba(79, 70, 229, 0.1);
+            padding: 5px;
+            border-radius: 50%;
+        }
+
+        /* Right side - Login form */
+        .login-section {
+            background: white;
+            border-radius: 40px;
+            padding: 48px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08), 0 10px 30px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-heading {
+            font-family: 'Sora', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            margin-bottom: 8px;
+        }
+
+        .form-sub {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        /* Form controls */
+        .field-group { margin-bottom: 24px; }
+
+        .field-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            letter-spacing: 0.02em;
+            margin-bottom: 8px;
+        }
+
+        .field-wrap {
+            position: relative;
+        }
+
+        .field-wrap .field-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1.1rem;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        .form-control {
+            width: 100%;
+            background: var(--bg-input);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            color: var(--text-main);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            padding: 16px 16px 16px 48px;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .form-control::placeholder { 
+            color: var(--text-light); 
+            font-weight: 400;
+        }
+
+        .form-control:focus {
+            border-color: var(--indigo);
+            background: white;
+            box-shadow: 0 4px 16px rgba(79, 70, 229, 0.15);
+        }
+
+        .form-control:focus + .field-icon,
+        .field-wrap:focus-within .field-icon { 
+            color: var(--indigo); 
+        }
+
+        /* Checkbox row */
+        .form-row-between {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-check-input {
+            background-color: white;
+            border: 2px solid var(--border);
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--indigo);
+            border-color: var(--indigo);
+        }
+
+        .form-check-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .forgot-link {
+            font-size: 0.9rem;
+            color: var(--indigo);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .forgot-link:hover { 
+            color: var(--violet); 
+            text-decoration: underline;
+        }
+
+        /* Submit button */
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 16px;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 8px 0 24px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--border), transparent);
+        }
+
+        .divider span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            font-weight: 500;
+            background: white;
+            padding: 0 10px;
+        }
+
+        /* Google button */
+        .btn-social {
+            width: 100%;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            color: var(--text-main);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.2s;
+            opacity: 0.8;
+        }
+
+        .btn-social:hover:not(:disabled) {
+            background: var(--bg-input);
+            border-color: var(--indigo);
+            opacity: 1;
+        }
+
+        .btn-social i {
+            color: #DB4437;
+            font-size: 1.2rem;
+        }
+
+        .btn-social:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Error alert */
+        .error-alert {
+            background: #fee2e2;
+            border: 2px solid #fecaca;
+            border-left: 4px solid #ef4444;
+            color: #b91c1c;
+            padding: 16px 20px;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        /* Terms line */
+        .terms-line {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 24px;
+        }
+
+        .terms-line a {
+            color: var(--indigo);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .terms-line a:hover { 
+            color: var(--violet);
+            text-decoration: underline; 
+        }
+
+        /* Signup link */
+        .signup-link {
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-top: 20px;
+            font-weight: 500;
+        }
+
+        .signup-link a {
+            color: var(--indigo);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                padding: 100px 24px 40px;
+                gap: 40px;
+            }
+            
+            .hero-section {
+                padding-right: 0;
+                text-align: center;
+            }
+            
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .stats-grid {
+                justify-content: center;
+            }
+            
+            .feature-list li {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 20px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .login-section {
+                padding: 32px 24px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">BarterBrain</a>
+        <div class="nav-links">
+            <a href="/features">Features</a>
+            <a href="/how-it-works">How it works</a>
+            <a href="/community">Community</a>
+            <a href="/register" class="btn-outline">Sign up free</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Left side - Hero section -->
+        <div class="hero-section">
+            <div class="hero-badge">✨ SKILL EXCHANGE PLATFORM</div>
+            <h1 class="hero-title">
+                Trade skills,<br>
+                <span>not money</span>
+            </h1>
+            <p class="hero-description">
+                Join thousands of learners and experts exchanging knowledge. 
+                Learn anything from coding to cooking, completely free.
+            </p>
+
+            <ul class="feature-list">
+                <li><i class="bi bi-check-circle-fill"></i> 50,000+ skills available to learn</li>
+                <li><i class="bi bi-check-circle-fill"></i> Connect with experts worldwide</li>
+                <li><i class="bi bi-check-circle-fill"></i> Build your reputation and earn badges</li>
+                <li><i class="bi bi-check-circle-fill"></i> Zero cost, pure knowledge exchange</li>
+            </ul>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">50K+</div>
+                    <div class="stat-label">Active learners</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Skills shared</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">150+</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right side - Login form -->
+        <div class="login-section">
+            <h2 class="form-heading">Welcome back</h2>
+            <p class="form-sub">Sign in to continue your learning journey</p>
+
+            <% if (locals.error) { %>
+            <div class="error-alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <%= error %>
+            </div>
+            <% } %>
+
+            <form action="/login" method="POST">
+                <div class="field-group">
+                    <label class="field-label" for="email">Email address</label>
+                    <div class="field-wrap">
+                        <input type="email" class="form-control" id="email" name="email"
+                               placeholder="you@example.com" required
+                               value="<%= locals.formData ? formData.email : '' %>">
+                        <i class="bi bi-envelope field-icon"></i>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="password">Password</label>
+                    <div class="field-wrap">
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="Enter your password" required>
+                        <i class="bi bi-lock field-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-row-between">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                        <label class="form-check-label" for="remember">Remember me</label>
+                    </div>
+                    <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    Sign In
+                </button>
+
+                <div class="divider"><span>or continue with</span></div>
+
+                <button type="button" class="btn-social" disabled>
+                    <i class="bi bi-google"></i>
+                    Google (Coming Soon)
+                </button>
+            </form>
+
+            <div class="signup-link">
+                Don't have an account? <a href="/register">Sign up free →</a>
+            </div>
+
+            <p class="terms-line">
+                By signing in, you agree to our
+                <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
