@@ -96,5 +96,18 @@ app.get('/health', (req, res) => {
     });
 });
 
+
+// Dashboard
+app.get('/dashboard', (req, res) => {
+    console.log('Dashboard route hit, userId:', req.session.userId);
+    console.log('Session:', req.session);
+    
+    if (!req.session.userId) {
+        console.log('No userId in session, redirecting to login');
+        return res.redirect('/login');
+    }
+    res.render('dashboard', { user: req.session.user });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

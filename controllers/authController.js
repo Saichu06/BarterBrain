@@ -7,21 +7,43 @@ exports.getLogin = (req, res) => {
 
 exports.postLogin = async (req, res) => {
     const { email, password } = req.body;
+    console.log('Login attempt for email:', email);
+    
     try {
         const user = await UserModel.findByEmail(email);
         if (!user) {
+            console.log('User not found');
             return res.render('login', { error: 'Invalid email or password' });
         }
+        
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
+            console.log('Password mismatch');
             return res.render('login', { error: 'Invalid email or password' });
         }
+        
+        console.log('Login successful for user:', user.user_id);
+        
         // Store user in session
         req.session.userId = user.user_id;
-        req.session.user = { id: user.user_id, name: user.full_name, email: user.email };
-        res.redirect('/dashboard');
+        req.session.user = { 
+            id: user.user_id, 
+            name: user.full_name, 
+            email: user.email 
+        };
+        
+        // Save session before redirecting
+        req.session.save((err) => {
+            if (err) {
+                console.error('Session save error:', err);
+                return res.render('login', { error: 'Login failed. Please try again.' });
+            }
+            console.log('Session saved, redirecting to dashboard');
+            res.redirect('/dashboard');
+        });
+        
     } catch (err) {
-        console.error(err);
+        console.error('Login error:', err);
         res.render('login', { error: 'Something went wrong' });
     }
 };
@@ -52,6 +74,10 @@ exports.postRegister = async (req, res) => {
 };
 
 exports.logout = (req, res) => {
-    req.session.destroy();
-    res.redirect('/login');
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Logout error:', err);
+        }
+        res.redirect('/login');
+    });
 };
