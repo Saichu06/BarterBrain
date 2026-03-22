@@ -1,0 +1,484 @@
+<%- include('partials/header') %>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+    :root {
+        --bg:#07070f; --bg-1:#0e0e1c; --bg-2:#13132a;
+        --il:#818cf8; --iv:#a78bfa; --text:#eeeeff; --muted:#7a7a9a;
+        --border:rgba(255,255,255,0.065); --green:#10b981; --amber:#f59e0b;
+        --bf:rgba(99,102,241,0.5);
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); }
+    a { text-decoration:none; color:inherit; }
+
+    .page-wrap { max-width:1000px; margin:0 auto; padding:48px 28px 100px; }
+
+    /* Hero */
+    .help-hero {
+        position:relative; overflow:hidden;
+        background:linear-gradient(135deg,#1b1640,#200e4a 55%,#130d2e);
+        border:1px solid rgba(99,102,241,0.22); border-radius:24px;
+        padding:60px 48px; margin-bottom:52px; text-align:center;
+    }
+    .help-hero::before {
+        content:''; position:absolute; width:500px; height:500px;
+        background:radial-gradient(circle,rgba(124,58,237,0.2),transparent 65%);
+        top:-180px; right:-80px; border-radius:50%; pointer-events:none;
+    }
+    .help-hero h1 {
+        font-family:'Sora',sans-serif; font-size:clamp(1.8rem,3.5vw,2.6rem);
+        font-weight:800; letter-spacing:-1px; color:var(--text);
+        margin-bottom:12px; position:relative; z-index:1;
+    }
+    .help-hero h1 span {
+        background:linear-gradient(120deg,var(--il),var(--iv));
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .help-hero p { font-size:0.92rem; color:var(--muted); margin-bottom:28px; position:relative; z-index:1; }
+
+    /* Search bar */
+    .help-search {
+        position:relative; max-width:500px; margin:0 auto; z-index:1;
+    }
+    .help-search i {
+        position:absolute; left:16px; top:50%; transform:translateY(-50%);
+        color:var(--muted); font-size:0.95rem; pointer-events:none; transition:color .2s;
+    }
+    #help-search-input {
+        width:100%; background:rgba(10,10,24,0.8); border:1px solid rgba(99,102,241,0.3);
+        border-radius:12px; color:var(--text); font-family:'DM Sans',sans-serif;
+        font-size:0.92rem; padding:14px 18px 14px 44px; outline:none;
+        transition:border-color .2s, box-shadow .2s; backdrop-filter:blur(10px);
+    }
+    #help-search-input::placeholder { color:rgba(122,122,154,0.5); }
+    #help-search-input:focus { border-color:var(--bf); box-shadow:0 0 0 3px rgba(79,70,229,0.15); }
+    .help-search:focus-within i { color:var(--il); }
+
+    /* Category pills */
+    .cat-pills {
+        display:flex; gap:8px; flex-wrap:wrap; margin-bottom:36px; justify-content:center;
+    }
+    .cat-pill {
+        display:inline-flex; align-items:center; gap:7px;
+        font-size:0.8rem; font-weight:600; padding:7px 16px; border-radius:100px;
+        background:var(--bg-1); border:1px solid var(--border); color:var(--muted);
+        cursor:pointer; transition:all .2s;
+    }
+    .cat-pill.active, .cat-pill:hover {
+        background:rgba(79,70,229,0.12); border-color:rgba(99,102,241,0.3); color:var(--il);
+    }
+
+    /* FAQ sections */
+    .faq-section { margin-bottom:48px; }
+    .faq-section-title {
+        display:flex; align-items:center; gap:10px; margin-bottom:16px;
+    }
+    .faq-section-icon {
+        width:34px; height:34px; border-radius:9px; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center; font-size:0.95rem;
+    }
+    .faq-section-title h2 {
+        font-family:'Sora',sans-serif; font-size:1rem; font-weight:700;
+        color:var(--text); letter-spacing:-0.2px;
+    }
+
+    /* Accordion */
+    .accordion { display:flex; flex-direction:column; gap:8px; }
+    .acc-item {
+        background:var(--bg-1); border:1px solid var(--border); border-radius:14px;
+        overflow:hidden; transition:border-color .2s;
+    }
+    .acc-item.open, .acc-item:hover { border-color:rgba(99,102,241,0.2); }
+
+    .acc-trigger {
+        width:100%; background:none; border:none; cursor:pointer;
+        display:flex; align-items:center; justify-content:space-between;
+        padding:16px 20px; gap:14px; text-align:left;
+    }
+    .acc-trigger h3 {
+        font-family:'Sora',sans-serif; font-size:0.9rem; font-weight:700;
+        color:var(--text); letter-spacing:-0.2px; flex:1;
+    }
+    .acc-trigger .chevron {
+        width:28px; height:28px; border-radius:8px;
+        background:rgba(255,255,255,0.04); border:1px solid var(--border);
+        display:flex; align-items:center; justify-content:center;
+        color:var(--muted); font-size:0.75rem; flex-shrink:0;
+        transition:transform .25s, background .2s;
+    }
+    .acc-item.open .chevron { transform:rotate(180deg); background:rgba(79,70,229,0.12); color:var(--il); }
+
+    .acc-body {
+        max-height:0; overflow:hidden; transition:max-height .3s ease;
+    }
+    .acc-item.open .acc-body { max-height:400px; }
+    .acc-body-inner {
+        padding:0 20px 18px; font-size:0.86rem; color:var(--muted); line-height:1.75;
+        border-top:1px solid rgba(255,255,255,0.04);
+    }
+    .acc-body-inner a { color:var(--il); }
+    .acc-body-inner a:hover { color:var(--iv); }
+
+    /* Contact card */
+    .contact-card {
+        background:var(--bg-1); border:1px solid var(--border); border-radius:20px;
+        padding:40px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;
+    }
+    .contact-option {
+        background:var(--bg-2); border:1px solid var(--border); border-radius:14px;
+        padding:24px; text-align:center; transition:border-color .25s, transform .2s;
+    }
+    .contact-option:hover { border-color:rgba(99,102,241,0.22); transform:translateY(-2px); }
+    .contact-icon {
+        width:48px; height:48px; border-radius:14px; margin:0 auto 14px;
+        display:flex; align-items:center; justify-content:center; font-size:1.3rem;
+    }
+    .contact-option h3 {
+        font-family:'Sora',sans-serif; font-size:0.92rem; font-weight:700;
+        color:var(--text); margin-bottom:6px;
+    }
+    .contact-option p { font-size:0.78rem; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+    .contact-btn {
+        display:inline-flex; align-items:center; gap:6px;
+        font-size:0.78rem; font-weight:700; padding:7px 16px; border-radius:100px;
+        background:rgba(79,70,229,0.1); border:1px solid rgba(99,102,241,0.2);
+        color:var(--il); transition:all .2s;
+    }
+    .contact-btn:hover { background:rgba(79,70,229,0.2); }
+
+    /* No results */
+    #no-faq-results {
+        display:none; text-align:center; padding:40px 20px;
+        font-size:0.88rem; color:var(--muted);
+    }
+
+    @media(max-width:768px){
+        .help-hero{padding:40px 24px;}
+        .contact-card{grid-template-columns:1fr; padding:24px;}
+    }
+    @media(max-width:640px){ .page-wrap{padding:24px 14px 80px;} }
+</style>
+
+<div class="page-wrap">
+
+    <!-- Hero -->
+    <div class="help-hero">
+        <h1>How can we <span>help you?</span></h1>
+        <p>Search our FAQ or browse by category to find answers quickly.</p>
+        <div class="help-search">
+            <i class="bi bi-search"></i>
+            <input type="text" id="help-search-input" placeholder="Search for answers…">
+        </div>
+    </div>
+
+    <!-- Category pills -->
+    <div class="cat-pills">
+        <button class="cat-pill active" data-cat="all">🌐 All Topics</button>
+        <button class="cat-pill" data-cat="account">👤 Account</button>
+        <button class="cat-pill" data-cat="offers">💼 Offers & Requests</button>
+        <button class="cat-pill" data-cat="matches">⚡ Matches</button>
+        <button class="cat-pill" data-cat="privacy">🔒 Privacy</button>
+        <button class="cat-pill" data-cat="reviews">⭐ Reviews</button>
+    </div>
+
+    <!-- FAQ Sections -->
+    <div id="faq-container">
+
+        <!-- Account -->
+        <div class="faq-section" data-cat="account">
+            <div class="faq-section-title">
+                <div class="faq-section-icon" style="background:rgba(79,70,229,0.15);">👤</div>
+                <h2>Account & Profile</h2>
+            </div>
+            <div class="accordion">
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>How do I create an account?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        Click "Sign Up Free" on the homepage or navigation bar. Fill in your full name, username, email, and password. You'll be taken to your dashboard immediately after registration. No email verification is required to get started.
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>How do I update my profile information?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        Go to <a href="/profile">My Profile</a> and click the "Edit Profile" button at the top. You can update your full name, username, email, and phone number. Click "Save Changes" to apply.
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>How do I change my password?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        On your <a href="/profile">Profile page</a>, scroll down to the Security section in the left column. Enter your current password, your new password, and confirm the new password. Click "Update Password" to save.
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>Can I delete my account?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        Yes. To delete your account, contact us at support@barterbrain.com with your registered email. We'll process the deletion within 30 days and remove all your personal data from our systems.
+                    </div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Offers & Requests -->
+        <div class="faq-section" data-cat="offers">
+            <div class="faq-section-title">
+                <div class="faq-section-icon" style="background:rgba(16,185,129,0.13);">💼</div>
+                <h2>Offers & Requests</h2>
+            </div>
+            <div class="accordion">
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>How do I create a skill offer?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        Go to <a href="/offers/new">Add Skill Offer</a> from your dashboard or navigation. Select the skill you want to offer from the dropdown, add an optional description about your level and what you can teach, then click "Create Offer".
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>What's the difference between an offer and a request?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        A <strong style="color:var(--text);">Skill Offer</strong> is a skill you're willing to teach others. A <strong style="color:var(--text);">Skill Request</strong> is a skill you want to learn from someone. You can have multiple offers and requests active at the same time.
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>How do I delete an offer or request?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        Go to <a href="/offers">My Offers</a> or <a href="/requests">My Requests</a>, find the card you want to remove, and click the "Delete" button. You'll be asked to confirm before deletion.
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>How many offers/requests can I have at once?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        There is currently no limit on the number of offers or requests you can create. We encourage you to list all the skills you can teach and everything you want to learn.
+                    </div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matches -->
+        <div class="faq-section" data-cat="matches">
+            <div class="faq-section-title">
+                <div class="faq-section-icon" style="background:rgba(124,58,237,0.15);">⚡</div>
+                <h2>Matches</h2>
+            </div>
+            <div class="accordion">
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>How does matching work?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        Go to <a href="/matches/potential">Find Matches</a>. The platform shows you skill offers from other users that correspond to your active skill requests. You can create a match by clicking "Create Match" on any offer that interests you.
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>What are match statuses?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        <strong style="color:#fbbf24;">Pending</strong> — Match created, waiting for the offer owner to accept.<br><br>
+                        <strong style="color:#34d399;">Accepted</strong> — Both parties have agreed. Contact information is now visible.<br><br>
+                        <strong style="color:#60a5fa;">Completed</strong> — The exchange is done. You can now leave a review.
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>When can I see the other person's contact info?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        Contact information becomes visible only after a match is accepted by the offer owner. On an accepted match, click "Show Contact" to reveal the other person's email and phone number.
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>How do I complete a match?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        Once you've finished your skill exchange sessions, click "Complete Exchange" on the accepted match. This marks the exchange as done and allows both parties to leave reviews for each other.
+                    </div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Privacy -->
+        <div class="faq-section" data-cat="privacy">
+            <div class="faq-section-title">
+                <div class="faq-section-icon" style="background:rgba(16,185,129,0.13);">🔒</div>
+                <h2>Privacy & Safety</h2>
+            </div>
+            <div class="accordion">
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>Who can see my contact information?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        Your email and phone number are never publicly visible. They are only shared with another user after both of you have agreed to an accepted match. No one else can see your contact details.
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>Does BarterBrain sell my data?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        No. We never sell, rent, or trade your personal data to third parties. Your data is used solely to operate and improve the BarterBrain platform. See our <a href="/privacy">Privacy Policy</a> for full details.
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>How do I report a user?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        If you encounter abusive or fraudulent behaviour, contact us immediately at support@barterbrain.com with details of the incident. We take all reports seriously and will investigate promptly.
+                    </div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews -->
+        <div class="faq-section" data-cat="reviews">
+            <div class="faq-section-title">
+                <div class="faq-section-icon" style="background:rgba(245,158,11,0.12);">⭐</div>
+                <h2>Reviews & Reputation</h2>
+            </div>
+            <div class="accordion">
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>How is my reputation score calculated?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        Your reputation score is the average rating across all reviews you've received from completed skill exchanges. Ratings are on a 1–5 star scale. The more positive exchanges you complete, the higher your score.
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>When can I leave a review?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        You can leave a review after a match has been marked as "Completed". Go to <a href="/matches">My Matches</a>, find the completed match, and click "Leave Review". Reviews help the community maintain quality exchanges.
+                    </div></div>
+                </div>
+                <div class="acc-item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <h3>Can I edit or delete a review I left?</h3>
+                        <span class="chevron"><i class="bi bi-chevron-down"></i></span>
+                    </button>
+                    <div class="acc-body"><div class="acc-body-inner">
+                        Currently, reviews cannot be edited or deleted after submission to maintain integrity. If you believe a review was submitted in error, contact us at support@barterbrain.com and we'll review the case.
+                    </div></div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end faq-container -->
+
+    <div id="no-faq-results"><p>No results found. Try different keywords or <a style="color:var(--il);" href="mailto:support@barterbrain.com">contact us directly</a>.</p></div>
+
+    <!-- Contact -->
+    <div style="margin-top:56px;">
+        <div style="text-align:center;margin-bottom:28px;">
+            <h2 style="font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;">Still need help?</h2>
+            <p style="font-size:0.88rem;color:var(--muted);">Can't find what you're looking for? Reach out directly.</p>
+        </div>
+        <div class="contact-card">
+            <div class="contact-option">
+                <div class="contact-icon" style="background:rgba(79,70,229,0.15);">📧</div>
+                <h3>Email Support</h3>
+                <p>Send us an email and we'll get back to you within 24 hours.</p>
+                <a href="mailto:support@barterbrain.com" class="contact-btn"><i class="bi bi-envelope-fill"></i> Email Us</a>
+            </div>
+            <div class="contact-option">
+                <div class="contact-icon" style="background:rgba(16,185,129,0.13);">📋</div>
+                <h3>Terms & Policies</h3>
+                <p>Review our terms, privacy policy, and community guidelines.</p>
+                <a href="/terms" class="contact-btn"><i class="bi bi-file-text-fill"></i> Read Docs</a>
+            </div>
+            <div class="contact-option">
+                <div class="contact-icon" style="background:rgba(245,158,11,0.12);">🐛</div>
+                <h3>Report an Issue</h3>
+                <p>Found a bug or want to give feedback? We'd love to hear from you.</p>
+                <a href="mailto:bugs@barterbrain.com" class="contact-btn"><i class="bi bi-bug-fill"></i> Report Bug</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Accordion toggle
+    function toggleAcc(trigger) {
+        const item = trigger.closest('.acc-item');
+        const isOpen = item.classList.contains('open');
+        // Close all
+        document.querySelectorAll('.acc-item.open').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+    }
+
+    // Category filter
+    document.querySelectorAll('.cat-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+            document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            const cat = pill.dataset.cat;
+            document.querySelectorAll('.faq-section').forEach(sec => {
+                sec.style.display = (cat === 'all' || sec.dataset.cat === cat) ? 'block' : 'none';
+            });
+        });
+    });
+
+    // Search filter
+    document.getElementById('help-search-input').addEventListener('input', function () {
+        const q = this.value.toLowerCase().trim();
+        let anyVisible = false;
+        document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+        document.querySelector('[data-cat="all"]').classList.add('active');
+
+        document.querySelectorAll('.faq-section').forEach(sec => { sec.style.display = 'block'; });
+
+        document.querySelectorAll('.acc-item').forEach(item => {
+            const text = item.textContent.toLowerCase();
+            const match = !q || text.includes(q);
+            item.style.display = match ? 'block' : 'none';
+            if (match) anyVisible = true;
+        });
+
+        // Hide empty sections
+        document.querySelectorAll('.faq-section').forEach(sec => {
+            const visible = [...sec.querySelectorAll('.acc-item')].some(i => i.style.display !== 'none');
+            sec.style.display = visible ? 'block' : 'none';
+        });
+
+        document.getElementById('no-faq-results').style.display = anyVisible ? 'none' : 'block';
+    });
+</script>
+
+<%- include('partials/footer') %>

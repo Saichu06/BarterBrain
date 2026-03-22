@@ -10,5 +10,6 @@ router.post('/:matchId/accept', isAuth, matchController.acceptMatch);
 router.post('/:matchId/complete', isAuth, matchController.completeMatch);
 router.get('/:matchId/review', isAuth, matchController.getReviewForm);
 router.post('/:matchId/review', isAuth, matchController.submitReview);
+router.post('/:matchId/reject', isAuth, matchController.rejectMatch);
 
 module.exports = router;

@@ -31,7 +31,7 @@ const availabilityRoutes = require('./routes/availabilityRoutes');
 const userRoutes = require('./routes/userRoutes');
 const apiRoutes = require('./routes/apiRoutes');
 const profileRoutes = require('./routes/profileRoutes');
-
+const searchRoutes = require('./routes/searchRoutes');
 app.use('/user', userRoutes);
 app.use('/', authRoutes);
 app.use('/offers', offerRoutes);
@@ -40,6 +40,8 @@ app.use('/matches', matchRoutes);
 app.use('/availability', availabilityRoutes);
 app.use('/api', apiRoutes);
 app.use('/profile', profileRoutes);
+app.use('/search', searchRoutes);
+
 // Home route – redirect to dashboard or login
 // Home route
 app.get('/', (req, res) => {
@@ -48,6 +50,36 @@ app.get('/', (req, res) => {
     } else {
         res.render('home');
     }
+});
+
+
+app.get('/about', (req, res) => {
+    res.render('about');
+});
+ 
+// Features  →  views/features.ejs
+app.get('/features', (req, res) => {
+    res.render('features');
+});
+ 
+// Terms of Service  →  views/terms.ejs
+app.get('/terms', (req, res) => {
+    res.render('terms');
+});
+ 
+// Privacy Policy  →  views/privacy.ejs
+app.get('/privacy', (req, res) => {
+    res.render('privacy');
+});
+ 
+// Cookie Policy  →  views/cookie-policy.ejs
+app.get('/cookie-policy', (req, res) => {
+    res.render('cookie-policy');
+});
+ 
+// Help Center  →  views/help.ejs
+app.get('/help', (req, res) => {
+    res.render('help');
 });
 
 

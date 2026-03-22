@@ -71,6 +71,16 @@ class MatchModel {
     return rows[0];
   }
 
+  // Add this method to models/matchModel.js
+
+static async rejectMatch(matchId) {
+    const [result] = await db.execute(
+        'UPDATE matches SET status = "rejected" WHERE match_id = ?',
+        [matchId]
+    );
+    return result.affectedRows > 0;
+}
+
   static async findByUser(userId) {
     const [rows] = await db.execute(
       `SELECT m.*, 

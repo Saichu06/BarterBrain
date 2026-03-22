@@ -1,0 +1,491 @@
+<%- include('partials/header') %>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+    :root {
+        --bg:#07070f; --bg-1:#0e0e1c; --bg-2:#13132a; --bg-3:#1a1a30;
+        --indigo:#4f46e5; --violet:#7c3aed; --il:#818cf8; --iv:#a78bfa;
+        --text:#eeeeff; --muted:#7a7a9a; --border:rgba(255,255,255,0.065);
+        --bf:rgba(99,102,241,0.5); --green:#10b981; --amber:#f59e0b;
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); }
+    a { text-decoration:none; color:inherit; }
+
+    .page-wrap { max-width:1100px; margin:0 auto; padding:36px 28px 100px; }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+        display:flex; align-items:center; gap:8px;
+        font-size:0.78rem; color:var(--muted); margin-bottom:24px;
+    }
+    .breadcrumb a { color:var(--muted); transition:color .2s; }
+    .breadcrumb a:hover { color:var(--il); }
+    .breadcrumb i { font-size:0.7rem; opacity:.5; }
+
+    /* ── HERO ── */
+    .search-hero {
+        position:relative; overflow:hidden;
+        background:linear-gradient(135deg,#1b1640,#200e4a 55%,#130d2e);
+        border:1px solid rgba(99,102,241,0.22); border-radius:24px;
+        padding:52px 52px 44px; margin-bottom:28px;
+    }
+    .search-hero::before {
+        content:''; position:absolute; width:500px; height:500px;
+        background:radial-gradient(circle,rgba(124,58,237,0.22),transparent 65%);
+        top:-180px; right:-80px; border-radius:50%; pointer-events:none;
+    }
+    .search-hero::after {
+        content:''; position:absolute; width:280px; height:280px;
+        background:radial-gradient(circle,rgba(79,70,229,0.16),transparent 65%);
+        bottom:-90px; left:60px; border-radius:50%; pointer-events:none;
+    }
+    .hero-content { position:relative; z-index:1; }
+
+    .hero-eyebrow {
+        display:inline-flex; align-items:center; gap:7px;
+        font-size:0.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+        color:#a5b4fc; background:rgba(99,102,241,0.12); border:1px solid rgba(99,102,241,0.2);
+        padding:4px 12px; border-radius:100px; margin-bottom:16px;
+    }
+
+    .search-hero h1 {
+        font-family:'Sora',sans-serif; font-size:clamp(1.7rem,3vw,2.4rem);
+        font-weight:800; letter-spacing:-1px; color:var(--text); margin-bottom:8px;
+    }
+    .search-hero h1 span {
+        background:linear-gradient(120deg,var(--il),var(--iv),#c084fc);
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .search-hero p { font-size:0.9rem; color:var(--muted); margin-bottom:28px; }
+
+    /* Search bar */
+    .search-bar {
+        display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .search-field {
+        position:relative; flex:1; min-width:200px;
+    }
+    .search-field i {
+        position:absolute; left:14px; top:50%; transform:translateY(-50%);
+        color:var(--muted); font-size:0.9rem; pointer-events:none; transition:color .2s;
+    }
+    .search-input {
+        width:100%; background:rgba(10,10,24,0.7); border:1px solid rgba(99,102,241,0.25);
+        border-radius:11px; color:var(--text); font-family:'DM Sans',sans-serif;
+        font-size:0.9rem; padding:12px 14px 12px 40px; outline:none;
+        transition:border-color .2s, box-shadow .2s; backdrop-filter:blur(8px);
+    }
+    .search-input::placeholder { color:rgba(122,122,154,0.45); }
+    .search-input:focus { border-color:var(--bf); box-shadow:0 0 0 3px rgba(79,70,229,0.14); }
+    .search-field:focus-within i { color:var(--il); }
+
+    .btn-search {
+        display:inline-flex; align-items:center; gap:8px;
+        background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff;
+        font-family:'Sora',sans-serif; font-size:0.88rem; font-weight:700;
+        padding:12px 24px; border-radius:11px; border:none; cursor:pointer;
+        box-shadow:0 0 22px rgba(79,70,229,0.35); transition:all .25s; white-space:nowrap;
+    }
+    .btn-search:hover { transform:translateY(-1px); box-shadow:0 6px 28px rgba(79,70,229,0.5); }
+
+    /* Trending skills */
+    .trending-row {
+        display:flex; align-items:center; flex-wrap:wrap;
+        gap:8px; margin-top:18px; position:relative; z-index:1;
+    }
+    .trending-label {
+        font-size:0.7rem; font-weight:700; letter-spacing:.08em;
+        text-transform:uppercase; color:var(--muted); white-space:nowrap;
+    }
+    .trending-pill {
+        display:inline-flex; align-items:center; gap:5px;
+        background:rgba(255,255,255,0.05); border:1px solid var(--border);
+        color:var(--muted); font-size:0.78rem; font-weight:600;
+        padding:5px 13px; border-radius:100px; cursor:pointer; transition:all .2s;
+    }
+    .trending-pill:hover {
+        background:rgba(99,102,241,0.12); border-color:rgba(99,102,241,0.3); color:var(--il);
+    }
+    .trending-pill .cnt {
+        font-size:0.65rem; color:rgba(122,122,154,0.5);
+    }
+
+    /* ── SECTION LABEL ── */
+    .sec-label {
+        font-size:0.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+        color:var(--muted); margin-bottom:14px; display:flex; align-items:center; gap:10px;
+    }
+    .sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* Result stats */
+    .result-stats {
+        display:none; align-items:center; gap:8px;
+        font-size:0.82rem; color:var(--muted); margin-bottom:18px;
+        padding:10px 16px; background:var(--bg-1); border:1px solid var(--border);
+        border-radius:10px;
+    }
+    .result-stats span { color:var(--il); font-weight:700; }
+
+    /* ── USER CARDS ── */
+    .users-grid {
+        display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:14px;
+    }
+
+    .user-card {
+        background:var(--bg-1); border:1px solid var(--border); border-radius:16px;
+        padding:20px; display:flex; align-items:flex-start; gap:14px;
+        cursor:pointer; transition:border-color .25s, transform .25s, box-shadow .25s;
+        position:relative; overflow:hidden;
+    }
+    .user-card::before {
+        content:''; position:absolute; top:0; left:0; right:0; height:1px;
+        background:linear-gradient(90deg,transparent,rgba(99,102,241,0.35),transparent);
+        opacity:0; transition:opacity .25s;
+    }
+    .user-card:hover {
+        border-color:rgba(99,102,241,0.25); transform:translateY(-3px);
+        box-shadow:0 14px 36px rgba(0,0,0,0.32);
+    }
+    .user-card:hover::before { opacity:1; }
+
+    .user-avatar {
+        width:48px; height:48px; border-radius:13px; flex-shrink:0;
+        background:linear-gradient(135deg,rgba(79,70,229,0.4),rgba(124,58,237,0.3));
+        border:1px solid rgba(99,102,241,0.35);
+        display:flex; align-items:center; justify-content:center;
+        font-family:'Sora',sans-serif; font-size:1.2rem; font-weight:800; color:#c4b5fd;
+        user-select:none;
+    }
+
+    .user-info { flex:1; min-width:0; }
+
+    .user-info h4 {
+        font-family:'Sora',sans-serif; font-size:0.92rem; font-weight:700;
+        color:var(--text); margin-bottom:2px; letter-spacing:-0.2px;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+
+    .user-handle { font-size:0.76rem; color:var(--muted); margin-bottom:8px; }
+
+    .user-rep {
+        display:flex; align-items:center; gap:6px; margin-bottom:8px;
+    }
+    .rep-stars { display:flex; gap:1px; }
+    .rep-stars .sf { color:#fbbf24; font-size:0.78rem; }
+    .rep-stars .se { color:rgba(251,191,36,0.2); font-size:0.78rem; }
+    .rep-num { font-size:0.74rem; color:var(--muted); }
+
+    .user-skills { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:6px; }
+    .skill-pill {
+        font-size:0.68rem; font-weight:600; padding:2px 9px; border-radius:100px;
+        background:rgba(79,70,229,0.1); border:1px solid rgba(99,102,241,0.18); color:var(--il);
+    }
+    .skill-more {
+        font-size:0.68rem; font-weight:600; padding:2px 9px; border-radius:100px;
+        background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--muted);
+    }
+
+    .user-meta { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .user-meta span {
+        font-size:0.72rem; color:rgba(122,122,154,0.6);
+        display:flex; align-items:center; gap:3px;
+    }
+
+    .card-arrow { color:var(--muted); opacity:.4; font-size:0.8rem; flex-shrink:0; margin-top:2px; }
+
+    /* ── STATES ── */
+    .loading-state {
+        display:flex; flex-direction:column; align-items:center;
+        justify-content:center; padding:60px 20px; gap:12px;
+    }
+    .loading-state i { font-size:2rem; color:var(--il); animation:spin 1s linear infinite; }
+    @keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+    .loading-state p { font-size:0.86rem; color:var(--muted); }
+
+    .empty-state {
+        display:flex; flex-direction:column; align-items:center;
+        justify-content:center; padding:60px 20px; text-align:center; gap:10px;
+        background:var(--bg-1); border:1px solid var(--border); border-radius:18px;
+    }
+    .empty-icon {
+        width:56px; height:56px; border-radius:16px;
+        background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.18);
+        display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-bottom:4px;
+    }
+    .empty-state h3 { font-family:'Sora',sans-serif; font-size:1rem; font-weight:700; color:var(--text); }
+    .empty-state p  { font-size:0.84rem; color:var(--muted); max-width:260px; line-height:1.6; }
+
+    /* Skeleton loader */
+    @keyframes shimmer {
+        0%   { background-position:-600px 0; }
+        100% { background-position: 600px 0; }
+    }
+    .skel {
+        background:linear-gradient(90deg,rgba(255,255,255,0.03) 25%,rgba(255,255,255,0.07) 50%,rgba(255,255,255,0.03) 75%);
+        background-size:1200px 100%; animation:shimmer 1.5s infinite; border-radius:6px;
+    }
+    .skel-card {
+        background:var(--bg-1); border:1px solid var(--border); border-radius:16px;
+        padding:20px; display:flex; gap:14px;
+    }
+    .skel-avatar { width:48px; height:48px; border-radius:13px; flex-shrink:0; }
+    .skel-lines { flex:1; display:flex; flex-direction:column; gap:8px; padding-top:4px; }
+    .skel-h { height:13px; width:55%; }
+    .skel-b { height:10px; width:35%; }
+    .skel-s { height:9px; width:70%; }
+
+    @media(max-width:768px){
+        .search-hero{padding:36px 24px 32px;}
+        .search-bar{flex-direction:column;}
+        .btn-search{width:100%;}
+        .users-grid{grid-template-columns:1fr;}
+    }
+    @media(max-width:640px){ .page-wrap{padding:20px 14px 80px;} }
+</style>
+
+<div class="page-wrap">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="/dashboard"><i class="bi bi-grid-fill"></i> Dashboard</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>Find People</span>
+    </div>
+
+    <!-- Hero + Search -->
+    <div class="search-hero">
+        <div class="hero-content">
+            <div class="hero-eyebrow">🔍 Discover</div>
+            <h1>Find <span>People</span></h1>
+            <p>Connect with learners and teachers who share your interests.</p>
+
+            <!-- Search bar -->
+            <div class="search-bar">
+                <div class="search-field">
+                    <i class="bi bi-person-fill"></i>
+                    <input type="text" id="searchName" class="search-input"
+                           placeholder="Search by name or username…" autocomplete="off">
+                </div>
+                <div class="search-field">
+                    <i class="bi bi-tag-fill"></i>
+                    <input type="text" id="searchSkill" class="search-input"
+                           placeholder="Filter by skill…" autocomplete="off">
+                </div>
+                <button class="btn-search" onclick="performSearch()">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+
+            <!-- Trending skills -->
+            <% if (locals.trendingSkills && trendingSkills.length > 0) { %>
+            <div class="trending-row">
+                <span class="trending-label">Trending</span>
+                <% trendingSkills.forEach(skill => { %>
+                    <span class="trending-pill" onclick="searchBySkill('<%= skill.skill_name %>')">
+                        <%= skill.skill_name %>
+                        <span class="cnt"><%= skill.mention_count %></span>
+                    </span>
+                <% }) %>
+            </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Result stats bar -->
+    <div class="result-stats" id="resultStats">
+        <i class="bi bi-people-fill" style="color:var(--il);"></i>
+        Found <span id="resultCount">0</span> user<span id="resultPlural">s</span>
+    </div>
+
+    <!-- Search results container -->
+    <div id="searchResults"></div>
+
+    <!-- Recently Joined (shown when no search active) -->
+    <div id="recentSection">
+        <div class="sec-label">Recently Joined</div>
+        <div class="users-grid" id="recentGrid">
+            <% if (locals.recentUsers && recentUsers.length > 0) { %>
+                <% recentUsers.forEach(u => {
+                    const repScore = parseFloat(u.reputation_score) || 0;
+                    const full = Math.floor(repScore);
+                %>
+                    <div class="user-card" onclick="viewProfile('<%= u.user_id %>')">
+                        <div class="user-avatar"><%= u.full_name ? u.full_name.charAt(0).toUpperCase() : '?' %></div>
+                        <div class="user-info">
+                            <h4><%= u.full_name %></h4>
+                            <div class="user-handle">@<%= u.username %></div>
+                            <div class="user-rep">
+                                <div class="rep-stars">
+                                    <% for(let i=0;i<full;i++) { %><span class="sf">★</span><% } %>
+                                    <% for(let i=full;i<5;i++) { %><span class="se">★</span><% } %>
+                                </div>
+                                <span class="rep-num"><%= repScore.toFixed(1) %></span>
+                            </div>
+                            <div class="user-meta">
+                                <span><i class="bi bi-briefcase-fill"></i> <%= u.offer_count || 0 %> offers</span>
+                            </div>
+                        </div>
+                        <i class="bi bi-chevron-right card-arrow"></i>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="empty-state" style="grid-column:1/-1;">
+                    <div class="empty-icon">👤</div>
+                    <h3>No users yet</h3>
+                    <p>Be the first to join and start exchanging skills!</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let searchTimeout;
+
+    // Debounce on both inputs
+    document.getElementById('searchName').addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(performSearch, 450);
+    });
+    document.getElementById('searchSkill').addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(performSearch, 450);
+    });
+
+    // Enter key on inputs
+    [document.getElementById('searchName'), document.getElementById('searchSkill')].forEach(el => {
+        el.addEventListener('keydown', e => { if (e.key === 'Enter') performSearch(); });
+    });
+
+    async function performSearch() {
+        const name  = document.getElementById('searchName').value.trim();
+        const skill = document.getElementById('searchSkill').value.trim();
+
+        if (!name && !skill) {
+            showRecent(true);
+            document.getElementById('resultStats').style.display = 'none';
+            document.getElementById('searchResults').innerHTML = '';
+            return;
+        }
+
+        showRecent(false);
+        showSkeleton();
+
+        try {
+            const params = new URLSearchParams();
+            if (name)  params.append('q', name);
+            if (skill) params.append('skill', skill);
+
+            const response = await fetch(`/search/api/users?${params.toString()}`);
+            const data = await response.json();
+
+            if (data.success) {
+                renderResults(data.users, data.count);
+            } else {
+                throw new Error('Search failed');
+            }
+        } catch (err) {
+            console.error('Search error:', err);
+            document.getElementById('resultStats').style.display = 'none';
+            document.getElementById('searchResults').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">⚠️</div>
+                    <h3>Something went wrong</h3>
+                    <p>Could not perform the search. Please try again.</p>
+                </div>`;
+        }
+    }
+
+    function renderResults(users, count) {
+        const statsEl   = document.getElementById('resultStats');
+        const resultsEl = document.getElementById('searchResults');
+
+        if (!users || users.length === 0) {
+            statsEl.style.display = 'none';
+            resultsEl.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🔍</div>
+                    <h3>No users found</h3>
+                    <p>No one matches your search. Try different keywords or browse trending skills.</p>
+                </div>`;
+            return;
+        }
+
+        statsEl.style.display = 'flex';
+        document.getElementById('resultCount').textContent = count;
+        document.getElementById('resultPlural').textContent = count !== 1 ? 's' : '';
+
+        const cards = users.map(user => {
+            const rep   = parseFloat(user.reputation_score) || 0;
+            const full  = Math.floor(rep);
+            const stars = '★'.repeat(full) + '☆'.repeat(5 - full);
+
+            const skillsHtml = user.skills && user.skills.length > 0
+                ? user.skills.slice(0, 3).map(s => `<span class="skill-pill">${esc(s)}</span>`).join('')
+                  + (user.skills.length > 3 ? `<span class="skill-more">+${user.skills.length - 3}</span>` : '')
+                : '';
+
+            const starsHtml = [...'★'.repeat(full)].map(() => `<span class="sf">★</span>`).join('')
+                            + [...'☆'.repeat(5 - full)].map(() => `<span class="se">★</span>`).join('');
+
+            return `
+                <div class="user-card" onclick="viewProfile(${user.user_id})">
+                    <div class="user-avatar">${esc(user.full_name.charAt(0).toUpperCase())}</div>
+                    <div class="user-info">
+                        <h4>${esc(user.full_name)}</h4>
+                        <div class="user-handle">@${esc(user.username)}</div>
+                        <div class="user-rep">
+                            <div class="rep-stars">${starsHtml}</div>
+                            <span class="rep-num">${rep.toFixed(1)}</span>
+                        </div>
+                        ${skillsHtml ? `<div class="user-skills">${skillsHtml}</div>` : ''}
+                        <div class="user-meta">
+                            <span><i class="bi bi-calendar3"></i> ${esc(user.memberSince || 'recently')}</span>
+                            ${user.offer_count ? `<span><i class="bi bi-briefcase-fill"></i> ${user.offer_count} offers</span>` : ''}
+                        </div>
+                    </div>
+                    <i class="bi bi-chevron-right card-arrow"></i>
+                </div>`;
+        }).join('');
+
+        resultsEl.innerHTML = `<div class="users-grid">${cards}</div>`;
+    }
+
+    function showSkeleton() {
+        const skelCard = `
+            <div class="skel-card">
+                <div class="skel skel-avatar"></div>
+                <div class="skel-lines">
+                    <div class="skel skel-h"></div>
+                    <div class="skel skel-b"></div>
+                    <div class="skel skel-s"></div>
+                </div>
+            </div>`;
+        document.getElementById('searchResults').innerHTML =
+            `<div class="users-grid">${skelCard.repeat(4)}</div>`;
+    }
+
+    function showRecent(show) {
+        document.getElementById('recentSection').style.display = show ? 'block' : 'none';
+    }
+
+    function searchBySkill(skill) {
+        document.getElementById('searchSkill').value = skill;
+        performSearch();
+    }
+
+    function viewProfile(userId) {
+        window.location.href = `/user/${userId}`;
+    }
+
+    function esc(text) {
+        if (!text) return '';
+        const d = document.createElement('div');
+        d.textContent = text;
+        return d.innerHTML;
+    }
+</script>
+
+<%- include('partials/footer') %>

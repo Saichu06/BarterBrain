@@ -27,6 +27,34 @@ class SkillModel {
         return rows[0];
     }
 
+    static async findByName(skillName) {
+        const [rows] = await db.execute(
+            'SELECT * FROM skills WHERE skill_name = ?',
+            [skillName.trim()]
+        );
+        return rows[0];
+    }
+
+    static async findOrCreate(skillName, categoryId = null) {
+        // Trim and normalise skill name (capitalise first letter)
+        const cleanName = skillName.trim().charAt(0).toUpperCase() + skillName.trim().slice(1).toLowerCase();
+
+        // Try to find existing skill
+        let skill = await this.findByName(cleanName);
+        if (skill) return skill.skill_id;
+
+        // Create new skill - ensure categoryId is null if not provided
+        const finalCategoryId = (categoryId === null || categoryId === undefined || categoryId === '') 
+            ? null 
+            : parseInt(categoryId);
+        
+        const [result] = await db.execute(
+            'INSERT INTO skills (skill_name, category_id, is_custom) VALUES (?, ?, ?)',
+            [cleanName, finalCategoryId, true]
+        );
+        return result.insertId;
+    }
+
     static async create(skillName, categoryId) {
         const [result] = await db.execute(
             'INSERT INTO skills (skill_name, category_id) VALUES (?, ?)',

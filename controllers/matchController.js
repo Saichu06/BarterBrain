@@ -89,6 +89,21 @@ exports.getReviewForm = async (req, res) => {
     }
 };
 
+
+// Add this method to controllers/matchController.js
+
+exports.rejectMatch = async (req, res) => {
+    const { matchId } = req.params;
+    try {
+        const MatchModel = require('../models/matchModel');
+        await MatchModel.rejectMatch(matchId);
+        res.redirect('/matches');
+    } catch (err) {
+        console.error('Error rejecting match:', err);
+        res.status(500).send('Error rejecting match');
+    }
+};
+
 exports.submitReview = async (req, res) => {
     const { matchId } = req.params;
     const { rating, comment } = req.body;

@@ -1,0 +1,221 @@
+<%- include('partials/header') %>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+    :root {
+        --bg:#07070f; --bg-1:#0e0e1c; --bg-2:#13132a;
+        --il:#818cf8; --iv:#a78bfa; --text:#eeeeff; --muted:#7a7a9a;
+        --border:rgba(255,255,255,0.065); --green:#10b981;
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); }
+    a { color:var(--il); text-decoration:none; }
+    a:hover { color:var(--iv); }
+
+    .page-wrap { max-width:860px; margin:0 auto; padding:48px 28px 100px; }
+
+    .doc-hero {
+        position:relative; overflow:hidden;
+        background:linear-gradient(135deg,#0d2010,#0f2d18 55%,#081510);
+        border:1px solid rgba(16,185,129,0.2); border-radius:22px;
+        padding:44px 48px; margin-bottom:40px; text-align:center;
+    }
+    .doc-hero::before {
+        content:''; position:absolute; width:400px; height:400px;
+        background:radial-gradient(circle,rgba(16,185,129,0.15),transparent 65%);
+        top:-150px; right:-80px; border-radius:50%; pointer-events:none;
+    }
+    .doc-hero-icon {
+        width:56px; height:56px; border-radius:16px; margin:0 auto 18px;
+        background:rgba(16,185,129,0.14); border:1px solid rgba(16,185,129,0.22);
+        display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+        position:relative; z-index:1;
+    }
+    .doc-hero h1 {
+        font-family:'Sora',sans-serif; font-size:clamp(1.6rem,3vw,2.2rem);
+        font-weight:800; letter-spacing:-0.8px; color:var(--text);
+        margin-bottom:10px; position:relative; z-index:1;
+    }
+    .doc-hero p { font-size:0.88rem; color:var(--muted); position:relative; z-index:1; }
+    .updated-tag {
+        display:inline-flex; align-items:center; gap:6px; font-size:0.72rem;
+        font-weight:700; padding:4px 12px; border-radius:100px; margin-top:10px;
+        background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.18); color:#34d399;
+    }
+
+    .toc-card {
+        background:var(--bg-1); border:1px solid var(--border); border-radius:16px;
+        padding:22px 26px; margin-bottom:36px;
+    }
+    .toc-card h3 {
+        font-family:'Sora',sans-serif; font-size:0.82rem; font-weight:700;
+        letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:14px;
+    }
+    .toc-list { list-style:none; padding:0; display:flex; flex-direction:column; gap:8px; }
+    .toc-list li a {
+        font-size:0.84rem; color:var(--muted); display:flex; align-items:center; gap:8px; transition:color .2s;
+    }
+    .toc-list li a::before {
+        content:''; width:4px; height:4px; border-radius:50%; background:#34d399; flex-shrink:0; opacity:.5;
+    }
+    .toc-list li a:hover { color:#34d399; }
+
+    .doc-body { display:flex; flex-direction:column; gap:32px; }
+
+    .doc-section {
+        background:var(--bg-1); border:1px solid var(--border); border-radius:18px;
+        padding:28px 32px; scroll-margin-top:90px;
+    }
+    .doc-section h2 {
+        font-family:'Sora',sans-serif; font-size:1.05rem; font-weight:700;
+        color:var(--text); margin-bottom:16px; padding-bottom:12px;
+        border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;
+    }
+    .doc-section h2 .num {
+        width:26px; height:26px; border-radius:7px; flex-shrink:0;
+        background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.2);
+        display:flex; align-items:center; justify-content:center;
+        font-size:0.72rem; font-weight:800; color:#34d399;
+    }
+    .doc-section p { font-size:0.88rem; color:var(--muted); line-height:1.8; margin-bottom:12px; }
+    .doc-section p:last-child { margin-bottom:0; }
+    .doc-section ul { list-style:none; padding:0; margin:12px 0; display:flex; flex-direction:column; gap:8px; }
+    .doc-section ul li {
+        font-size:0.86rem; color:var(--muted); line-height:1.6;
+        display:flex; align-items:flex-start; gap:10px;
+    }
+    .doc-section ul li::before {
+        content:''; width:5px; height:5px; border-radius:50%;
+        background:#34d399; flex-shrink:0; margin-top:7px; opacity:.6;
+    }
+    .highlight-box {
+        background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.15);
+        border-left:3px solid #10b981; border-radius:10px;
+        padding:14px 18px; margin:16px 0; font-size:0.84rem; color:var(--muted); line-height:1.7;
+    }
+
+    @media(max-width:640px){ .page-wrap{padding:24px 14px 80px;} .doc-hero{padding:30px 22px;} .doc-section{padding:22px 18px;} }
+</style>
+
+<div class="page-wrap">
+
+    <div class="doc-hero">
+        <div class="doc-hero-icon">🔒</div>
+        <h1>Privacy Policy</h1>
+        <p>We take your privacy seriously. Here's exactly how we handle your data.</p>
+        <span class="updated-tag"><i class="bi bi-check-circle-fill"></i> Last updated: January 2024</span>
+    </div>
+
+    <div class="toc-card">
+        <h3>Table of Contents</h3>
+        <ul class="toc-list">
+            <li><a href="#info-collect">1. Information We Collect</a></li>
+            <li><a href="#how-use">2. How We Use Your Information</a></li>
+            <li><a href="#sharing">3. Information Sharing</a></li>
+            <li><a href="#contact-visibility">4. Contact Information Visibility</a></li>
+            <li><a href="#data-security">5. Data Security</a></li>
+            <li><a href="#cookies-p">6. Cookies</a></li>
+            <li><a href="#your-rights">7. Your Rights</a></li>
+            <li><a href="#retention">8. Data Retention</a></li>
+            <li><a href="#children">9. Children's Privacy</a></li>
+            <li><a href="#contact-privacy">10. Contact Us</a></li>
+        </ul>
+    </div>
+
+    <div class="doc-body">
+
+        <div class="doc-section" id="info-collect">
+            <h2><span class="num">1</span> Information We Collect</h2>
+            <p>We collect information you provide directly to us when you create an account or use our services:</p>
+            <ul>
+                <li>Full name and username</li>
+                <li>Email address and phone number (optional)</li>
+                <li>Skill offers and skill requests you create</li>
+                <li>Reviews and ratings you submit</li>
+                <li>Availability schedules you set</li>
+            </ul>
+            <p>We also automatically collect certain technical information such as IP address, browser type, and usage patterns to improve the platform.</p>
+        </div>
+
+        <div class="doc-section" id="how-use">
+            <h2><span class="num">2</span> How We Use Your Information</h2>
+            <p>We use the information we collect to:</p>
+            <ul>
+                <li>Provide, operate and maintain the BarterBrain platform</li>
+                <li>Match you with compatible skill exchange partners</li>
+                <li>Send account-related notifications and updates</li>
+                <li>Improve and personalize your experience</li>
+                <li>Detect and prevent fraud or abuse</li>
+                <li>Respond to your support requests</li>
+            </ul>
+            <div class="highlight-box">We never sell your personal data to third parties. Your information is used solely to operate and improve BarterBrain.</div>
+        </div>
+
+        <div class="doc-section" id="sharing">
+            <h2><span class="num">3</span> Information Sharing</h2>
+            <p>We do not sell, trade, or rent your personal information to third parties. We may share limited information in these circumstances:</p>
+            <ul>
+                <li>With other users, as described in our contact visibility section</li>
+                <li>With service providers who assist in operating our platform (under strict confidentiality agreements)</li>
+                <li>When required by law or to protect our legal rights</li>
+                <li>In connection with a merger or acquisition (users will be notified)</li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="contact-visibility">
+            <h2><span class="num">4</span> Contact Information Visibility</h2>
+            <p>Your contact details (email and phone number) are <strong style="color:var(--text);">never shown publicly</strong>. They are only shared with another user after both parties have accepted a skill exchange match.</p>
+            <div class="highlight-box">Privacy first — your contact information remains hidden until you and your match partner have both agreed to connect.</div>
+        </div>
+
+        <div class="doc-section" id="data-security">
+            <h2><span class="num">5</span> Data Security</h2>
+            <p>We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction. This includes:</p>
+            <ul>
+                <li>Password hashing using industry-standard algorithms</li>
+                <li>HTTPS encryption for all data in transit</li>
+                <li>Regular security audits and vulnerability assessments</li>
+                <li>Limited employee access to personal data on a need-to-know basis</li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="cookies-p">
+            <h2><span class="num">6</span> Cookies</h2>
+            <p>We use cookies to maintain your session, remember your preferences, and improve platform performance. See our <a href="/cookie-policy">Cookie Policy</a> for full details on what cookies we use and how to manage them.</p>
+        </div>
+
+        <div class="doc-section" id="your-rights">
+            <h2><span class="num">7</span> Your Rights</h2>
+            <p>You have the right to:</p>
+            <ul>
+                <li>Access the personal data we hold about you</li>
+                <li>Request correction of inaccurate data</li>
+                <li>Request deletion of your account and associated data</li>
+                <li>Opt out of non-essential communications</li>
+                <li>Data portability — receive a copy of your data in a machine-readable format</li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="retention">
+            <h2><span class="num">8</span> Data Retention</h2>
+            <p>We retain your personal data for as long as your account is active. If you delete your account, we will delete your personal data within 30 days, except where retention is required by law.</p>
+        </div>
+
+        <div class="doc-section" id="children">
+            <h2><span class="num">9</span> Children's Privacy</h2>
+            <p>BarterBrain is not directed to children under 13. We do not knowingly collect personal information from children under 13. If you believe a child has provided us with personal data, please contact us immediately.</p>
+        </div>
+
+        <div class="doc-section" id="contact-privacy">
+            <h2><span class="num">10</span> Contact Us</h2>
+            <p>For any privacy-related questions or to exercise your rights, contact us at:</p>
+            <ul>
+                <li>Email: privacy@barterbrain.com</li>
+                <li>Through the <a href="/help">Help Center</a></li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<%- include('partials/footer') %>

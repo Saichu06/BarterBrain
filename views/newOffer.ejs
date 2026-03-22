@@ -110,6 +110,26 @@
     }
     .btn-cancel:hover { background:rgba(255,255,255,0.07); color:var(--text); }
 
+    .skill-suggestions {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .skill-suggestions span {
+        background: rgba(79,70,229,0.1);
+        border: 1px solid rgba(79,70,229,0.2);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .skill-suggestions span:hover {
+        background: rgba(79,70,229,0.2);
+        border-color: rgba(79,70,229,0.4);
+    }
+
     @media(max-width:640px){ .page-wrap{padding:24px 14px 80px;} .form-body{padding:22px;} .form-card-header{padding:22px;} }
 </style>
 
@@ -138,24 +158,45 @@
 
             <form action="/offers" method="POST">
                 <div class="field-group">
-                    <label class="field-label" for="skill_id">Select Skill</label>
+                    <label class="field-label" for="skill_name">Skill Name *</label>
                     <div class="field-wrap">
-                        <select name="skill_id" id="skill_id" class="form-select" required>
-                            <option value="">— Choose a skill —</option>
-                            <% skills.forEach(skill => { %>
-                                <option value="<%= skill.skill_id %>">
-                                    <%= skill.skill_name %> (<%= skill.category_name || 'Uncategorized' %>)
+                        <input type="text" name="skill_name" id="skill_name" class="form-control" 
+                               placeholder="e.g., JavaScript, Guitar, Spanish, Photography..."
+                               value="<%= locals.formData ? formData.skill_name : '' %>" required>
+                        <i class="bi bi-tag field-icon"></i>
+                    </div>
+                    <div class="skill-suggestions">
+                        <span onclick="document.getElementById('skill_name').value='JavaScript'">JavaScript</span>
+                        <span onclick="document.getElementById('skill_name').value='Python'">Python</span>
+                        <span onclick="document.getElementById('skill_name').value='React'">React</span>
+                        <span onclick="document.getElementById('skill_name').value='Guitar'">Guitar</span>
+                        <span onclick="document.getElementById('skill_name').value='Spanish'">Spanish</span>
+                        <span onclick="document.getElementById('skill_name').value='Tennis'">Tennis</span>
+                        <span onclick="document.getElementById('skill_name').value='Digital Art'">Digital Art</span>
+                        <span onclick="document.getElementById('skill_name').value='Yoga'">Yoga</span>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="category_id">Category (Optional)</label>
+                    <div class="field-wrap">
+                        <select name="category_id" id="category_id" class="form-select">
+                            <option value="">-- Select a category (optional) --</option>
+                            <% categories.forEach(cat => { %>
+                                <option value="<%= cat.category_id %>"
+                                    <%= locals.formData && formData.category_id == cat.category_id ? 'selected' : '' %>>
+                                    <%= cat.category_name %>
                                 </option>
                             <% }) %>
                         </select>
-                        <i class="bi bi-mortarboard field-icon"></i>
+                        <i class="bi bi-folder field-icon"></i>
                     </div>
                 </div>
 
                 <div class="field-group">
                     <label class="field-label" for="description">Description <span style="text-transform:none;letter-spacing:0;font-weight:400;color:rgba(122,122,154,0.6);">(optional)</span></label>
                     <textarea name="description" id="description" class="form-control"
-                        placeholder="Describe your skill level, what you can teach, your teaching style…"></textarea>
+                        placeholder="Describe your skill level, what you can teach, your teaching style…"><%= locals.formData ? formData.description : '' %></textarea>
                 </div>
 
                 <div class="form-actions">

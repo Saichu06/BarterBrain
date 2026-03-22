@@ -1,0 +1,234 @@
+<%- include('partials/header') %>
+
+<style>
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 30px 30px;
+        color: white;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: bold;
+        border: 3px solid white;
+    }
+    
+    .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .stat-box {
+        text-align: center;
+        padding: 1rem;
+        background: rgba(255,255,255,0.1);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    .section-card {
+        background: var(--bg-1);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .skill-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        margin: 0 8px 8px 0;
+        font-size: 0.85rem;
+    }
+    
+    .review-card {
+        background: rgba(255,255,255,0.03);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .btn-connect {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    
+    .btn-message {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    
+    .match-status {
+        background: rgba(16, 185, 129, 0.2);
+        color: #10b981;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="profile-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-3 text-center text-md-start">
+                <div class="profile-avatar mx-auto mx-md-0">
+                    <%= profileUser.full_name.charAt(0) %>
+                </div>
+            </div>
+            <div class="col-md-6 text-center text-md-start">
+                <h1><%= profileUser.full_name %></h1>
+                <p class="opacity-75">@<%= profileUser.username %></p>
+                <div>
+                    <% for(let i = 0; i < Math.floor(avgRating); i++) { %>★<% } %>
+                    <% for(let i = Math.floor(avgRating); i < 5; i++) { %>☆<% } %>
+                    <span class="ms-2"><%= avgRating.toFixed(1) %> / 5.0</span>
+                </div>
+                <p class="mt-2">
+                    <i class="bi bi-calendar"></i> Member since <%= new Date(profileUser.created_at).toLocaleDateString() %>
+                </p>
+            </div>
+            <div class="col-md-3 text-center text-md-end">
+                <% if (!existingMatch) { %>
+                    <a href="/matches/potential" class="btn-connect">
+                        <i class="bi bi-chat-dots"></i> Connect
+                    </a>
+                <% } else if (existingMatch.status === 'pending') { %>
+                    <div class="match-status">
+                        <i class="bi bi-clock-history"></i> Request Pending
+                    </div>
+                <% } else if (existingMatch.status === 'accepted') { %>
+                    <div class="match-status">
+                        <i class="bi bi-check-circle"></i> Connected!
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="profile-stats">
+            <div class="stat-box">
+                <div class="stat-number"><%= offers.length %></div>
+                <div>Skills Offered</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number"><%= requests.length %></div>
+                <div>Skills Wanted</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number"><%= reviewsAsTeacher.length + reviewsAsLearner.length %></div>
+                <div>Reviews</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6">
+            <!-- Skills Offered -->
+            <div class="section-card">
+                <h3><i class="bi bi-briefcase"></i> Skills Offered</h3>
+                <% if (offers.length > 0) { %>
+                    <div class="mt-3">
+                        <% offers.forEach(offer => { %>
+                            <span class="skill-badge"><%= offer.skill_name %></span>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <p class="text-muted mt-3">No skills offered yet</p>
+                <% } %>
+            </div>
+            
+            <!-- Skills Wanted -->
+            <div class="section-card">
+                <h3><i class="bi bi-journal-bookmark-fill"></i> Skills Wanted</h3>
+                <% if (requests.length > 0) { %>
+                    <div class="mt-3">
+                        <% requests.forEach(request => { %>
+                            <span class="skill-badge"><%= request.skill_name %></span>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <p class="text-muted mt-3">No skills requested yet</p>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <!-- Contact Information -->
+            <div class="section-card">
+                <h3><i class="bi bi-envelope"></i> Contact</h3>
+                <p><i class="bi bi-envelope"></i> <%= profileUser.email %></p>
+                <% if (profileUser.phone_number) { %>
+                    <p><i class="bi bi-telephone"></i> <%= profileUser.phone_number %></p>
+                <% } %>
+            </div>
+            
+            <!-- Reviews Received -->
+            <div class="section-card">
+                <h3><i class="bi bi-chat-square-text"></i> Reviews</h3>
+                <% if (reviewsAsTeacher.length > 0) { %>
+                    <h4 class="mt-3">As a Teacher</h4>
+                    <% reviewsAsTeacher.forEach(review => { %>
+                        <div class="review-card">
+                            <div class="review-rating">
+                                <% for(let i = 0; i < review.rating; i++) { %>★<% } %>
+                                <% for(let i = review.rating; i < 5; i++) { %>☆<% } %>
+                            </div>
+                            <p class="mt-2">"<%= review.comment || 'No comment' %>"</p>
+                            <small class="text-muted">- <%= review.reviewer_name %></small>
+                        </div>
+                    <% }) %>
+                <% } %>
+                
+                <% if (reviewsAsLearner.length > 0) { %>
+                    <h4 class="mt-3">As a Learner</h4>
+                    <% reviewsAsLearner.forEach(review => { %>
+                        <div class="review-card">
+                            <div class="review-rating">
+                                <% for(let i = 0; i < review.rating; i++) { %>★<% } %>
+                                <% for(let i = review.rating; i < 5; i++) { %>☆<% } %>
+                            </div>
+                            <p class="mt-2">"<%= review.comment || 'No comment' %>"</p>
+                            <small class="text-muted">- <%= review.reviewer_name %></small>
+                        </div>
+                    <% }) %>
+                <% } %>
+                
+                <% if (reviewsAsTeacher.length === 0 && reviewsAsLearner.length === 0) { %>
+                    <p class="text-muted mt-3">No reviews yet</p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

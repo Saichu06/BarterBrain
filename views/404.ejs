@@ -1,0 +1,86 @@
+<%- include('partials/header') %>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+    :root {
+        --bg:#07070f; --bg-1:#0e0e1c; --il:#818cf8; --iv:#a78bfa;
+        --text:#eeeeff; --muted:#7a7a9a; --border:rgba(255,255,255,0.065);
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); }
+    a { text-decoration:none; }
+
+    .not-found {
+        min-height: calc(100vh - 68px);
+        display: flex; align-items: center; justify-content: center;
+        padding: 40px 24px; text-align: center;
+    }
+
+    .nf-inner { max-width: 480px; }
+
+    .nf-code {
+        font-family: 'Sora', sans-serif;
+        font-size: clamp(6rem, 15vw, 9rem);
+        font-weight: 800;
+        letter-spacing: -6px;
+        line-height: 1;
+        background: linear-gradient(120deg, #818cf8, #a78bfa, #c084fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 16px;
+        display: block;
+        opacity: 0.35;
+    }
+
+    .nf-icon {
+        width: 72px; height: 72px; border-radius: 20px; margin: 0 auto 24px;
+        background: rgba(79,70,229,0.12); border: 1px solid rgba(99,102,241,0.2);
+        display: flex; align-items: center; justify-content: center; font-size: 2rem;
+    }
+
+    .nf-inner h1 {
+        font-family: 'Sora', sans-serif;
+        font-size: clamp(1.4rem, 3vw, 1.9rem);
+        font-weight: 800; letter-spacing: -0.6px;
+        color: var(--text); margin-bottom: 12px;
+    }
+
+    .nf-inner p {
+        font-size: 0.9rem; color: var(--muted);
+        line-height: 1.7; margin-bottom: 32px;
+    }
+
+    .nf-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    .btn-home {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff;
+        font-family: 'Sora', sans-serif; font-size: 0.88rem; font-weight: 700;
+        padding: 11px 24px; border-radius: 10px; border: none;
+        box-shadow: 0 0 24px rgba(79,70,229,0.35); transition: all .25s;
+    }
+    .btn-home:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(79,70,229,0.5); color: #fff; }
+
+    .btn-back {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+        color: var(--muted); font-size: 0.88rem; font-weight: 500;
+        padding: 11px 22px; border-radius: 10px; transition: all .2s;
+    }
+    .btn-back:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+</style>
+
+<div class="not-found">
+    <div class="nf-inner">
+        <span class="nf-code">404</span>
+        <div class="nf-icon">🔍</div>
+        <h1>Page not found</h1>
+        <p>The page you're looking for doesn't exist or has been moved. Let's get you back on track.</p>
+        <div class="nf-actions">
+            <a href="/" class="btn-home"><i class="bi bi-house-fill"></i> Go Home</a>
+            <a href="javascript:history.back()" class="btn-back"><i class="bi bi-arrow-left"></i> Go Back</a>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

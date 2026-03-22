@@ -1,0 +1,239 @@
+<%- include('partials/header') %>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+    :root {
+        --bg:#07070f; --bg-1:#0e0e1c; --bg-2:#13132a;
+        --il:#818cf8; --iv:#a78bfa; --text:#eeeeff; --muted:#7a7a9a;
+        --border:rgba(255,255,255,0.065);
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); }
+    a { color:var(--il); text-decoration:none; }
+    a:hover { color:var(--iv); }
+
+    .page-wrap { max-width:860px; margin:0 auto; padding:48px 28px 100px; }
+
+    /* Hero */
+    .doc-hero {
+        position:relative; overflow:hidden;
+        background:linear-gradient(135deg,#1b1640,#200e4a 55%,#130d2e);
+        border:1px solid rgba(99,102,241,0.22); border-radius:22px;
+        padding:44px 48px; margin-bottom:40px; text-align:center;
+    }
+    .doc-hero::before {
+        content:''; position:absolute; width:400px; height:400px;
+        background:radial-gradient(circle,rgba(124,58,237,0.2),transparent 65%);
+        top:-150px; right:-80px; border-radius:50%; pointer-events:none;
+    }
+    .doc-hero-icon {
+        width:56px; height:56px; border-radius:16px; margin:0 auto 18px;
+        background:rgba(79,70,229,0.18); border:1px solid rgba(99,102,241,0.25);
+        display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+        position:relative; z-index:1;
+    }
+    .doc-hero h1 {
+        font-family:'Sora',sans-serif; font-size:clamp(1.6rem,3vw,2.2rem);
+        font-weight:800; letter-spacing:-0.8px; color:var(--text);
+        margin-bottom:10px; position:relative; z-index:1;
+    }
+    .doc-hero p {
+        font-size:0.88rem; color:var(--muted); position:relative; z-index:1;
+    }
+
+    /* TOC */
+    .toc-card {
+        background:var(--bg-1); border:1px solid var(--border); border-radius:16px;
+        padding:22px 26px; margin-bottom:36px;
+    }
+    .toc-card h3 {
+        font-family:'Sora',sans-serif; font-size:0.82rem; font-weight:700;
+        letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+        margin-bottom:14px;
+    }
+    .toc-list { list-style:none; padding:0; display:flex; flex-direction:column; gap:8px; }
+    .toc-list li a {
+        font-size:0.84rem; color:var(--muted); display:flex; align-items:center; gap:8px;
+        transition:color .2s;
+    }
+    .toc-list li a::before {
+        content:''; width:4px; height:4px; border-radius:50%;
+        background:var(--il); flex-shrink:0; opacity:.5;
+    }
+    .toc-list li a:hover { color:var(--il); }
+
+    /* Doc body */
+    .doc-body { display:flex; flex-direction:column; gap:32px; }
+
+    .doc-section {
+        background:var(--bg-1); border:1px solid var(--border); border-radius:18px;
+        padding:28px 32px; scroll-margin-top:90px;
+    }
+
+    .doc-section h2 {
+        font-family:'Sora',sans-serif; font-size:1.05rem; font-weight:700;
+        color:var(--text); margin-bottom:16px; padding-bottom:12px;
+        border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;
+    }
+    .doc-section h2 .num {
+        width:26px; height:26px; border-radius:7px; flex-shrink:0;
+        background:rgba(79,70,229,0.15); border:1px solid rgba(99,102,241,0.2);
+        display:flex; align-items:center; justify-content:center;
+        font-size:0.72rem; font-weight:800; color:var(--il);
+    }
+
+    .doc-section p {
+        font-size:0.88rem; color:var(--muted); line-height:1.8; margin-bottom:12px;
+    }
+    .doc-section p:last-child { margin-bottom:0; }
+
+    .doc-section ul {
+        list-style:none; padding:0; margin:12px 0; display:flex; flex-direction:column; gap:8px;
+    }
+    .doc-section ul li {
+        font-size:0.86rem; color:var(--muted); line-height:1.6;
+        display:flex; align-items:flex-start; gap:10px;
+    }
+    .doc-section ul li::before {
+        content:''; width:5px; height:5px; border-radius:50%;
+        background:var(--il); flex-shrink:0; margin-top:7px; opacity:.6;
+    }
+
+    .highlight-box {
+        background:rgba(79,70,229,0.06); border:1px solid rgba(99,102,241,0.18);
+        border-left:3px solid var(--il); border-radius:10px;
+        padding:14px 18px; margin:16px 0;
+        font-size:0.84rem; color:var(--muted); line-height:1.7;
+    }
+
+    .updated-tag {
+        display:inline-flex; align-items:center; gap:6px;
+        font-size:0.72rem; font-weight:700; padding:4px 12px; border-radius:100px;
+        background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.18);
+        color:#34d399; margin-top:10px;
+    }
+
+    @media(max-width:640px){ .page-wrap{padding:24px 14px 80px;} .doc-hero{padding:30px 22px;} .doc-section{padding:22px 18px;} }
+</style>
+
+<div class="page-wrap">
+
+    <div class="doc-hero">
+        <div class="doc-hero-icon">📋</div>
+        <h1>Terms of Service</h1>
+        <p>Please read these terms carefully before using BarterBrain.</p>
+        <span class="updated-tag"><i class="bi bi-check-circle-fill"></i> Last updated: January 2024</span>
+    </div>
+
+    <div class="toc-card">
+        <h3>Table of Contents</h3>
+        <ul class="toc-list">
+            <li><a href="#acceptance">1. Acceptance of Terms</a></li>
+            <li><a href="#platform">2. Platform Description</a></li>
+            <li><a href="#eligibility">3. Eligibility</a></li>
+            <li><a href="#accounts">4. User Accounts</a></li>
+            <li><a href="#conduct">5. User Conduct</a></li>
+            <li><a href="#exchanges">6. Skill Exchanges</a></li>
+            <li><a href="#content">7. User Content</a></li>
+            <li><a href="#privacy">8. Privacy</a></li>
+            <li><a href="#termination">9. Termination</a></li>
+            <li><a href="#liability">10. Limitation of Liability</a></li>
+            <li><a href="#contact-terms">11. Contact</a></li>
+        </ul>
+    </div>
+
+    <div class="doc-body">
+
+        <div class="doc-section" id="acceptance">
+            <h2><span class="num">1</span> Acceptance of Terms</h2>
+            <p>By accessing or using BarterBrain ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Platform.</p>
+            <div class="highlight-box">These terms constitute a legally binding agreement between you and BarterBrain. By creating an account, you confirm you have read and understood these terms.</div>
+        </div>
+
+        <div class="doc-section" id="platform">
+            <h2><span class="num">2</span> Platform Description</h2>
+            <p>BarterBrain is a free skill-exchange platform that connects individuals who want to teach skills with those who want to learn. No monetary transactions occur on the platform — all exchanges are purely skill-based.</p>
+            <p>We facilitate connections but are not a party to any agreement formed between users. We do not guarantee the quality, safety, or legality of any skill exchange.</p>
+        </div>
+
+        <div class="doc-section" id="eligibility">
+            <h2><span class="num">3</span> Eligibility</h2>
+            <p>To use BarterBrain, you must:</p>
+            <ul>
+                <li>Be at least 18 years of age, or have parental/guardian consent</li>
+                <li>Provide accurate and complete registration information</li>
+                <li>Not be prohibited from receiving services under applicable law</li>
+                <li>Have a valid email address for account verification</li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="accounts">
+            <h2><span class="num">4</span> User Accounts</h2>
+            <p>You are responsible for maintaining the confidentiality of your account credentials. You agree to notify us immediately of any unauthorized use of your account.</p>
+            <ul>
+                <li>One account per person — multiple accounts are not permitted</li>
+                <li>You are responsible for all activity that occurs under your account</li>
+                <li>Sharing account credentials with others is prohibited</li>
+                <li>We reserve the right to suspend accounts that violate these terms</li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="conduct">
+            <h2><span class="num">5</span> User Conduct</h2>
+            <p>You agree not to use the Platform to:</p>
+            <ul>
+                <li>Post false, misleading, or fraudulent content</li>
+                <li>Harass, threaten, or harm other users</li>
+                <li>Solicit money or financial transactions outside the platform</li>
+                <li>Share another user's contact information without consent</li>
+                <li>Use the platform for commercial advertising or spam</li>
+                <li>Attempt to circumvent the platform's matching system</li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="exchanges">
+            <h2><span class="num">6</span> Skill Exchanges</h2>
+            <p>BarterBrain facilitates skill exchanges between users. By participating in an exchange, you acknowledge that:</p>
+            <ul>
+                <li>You are solely responsible for the quality of skills you teach</li>
+                <li>BarterBrain does not verify user-claimed skill levels</li>
+                <li>All exchange arrangements are made directly between users</li>
+                <li>Contact information is only revealed after both parties accept a match</li>
+            </ul>
+            <div class="highlight-box">BarterBrain is not responsible for disputes arising from skill exchanges. We encourage users to communicate openly and leave honest reviews.</div>
+        </div>
+
+        <div class="doc-section" id="content">
+            <h2><span class="num">7</span> User Content</h2>
+            <p>By submitting content to BarterBrain (profiles, descriptions, reviews), you grant us a non-exclusive, royalty-free license to display and distribute that content within the platform.</p>
+            <p>You retain ownership of your content. We will not sell your content to third parties.</p>
+        </div>
+
+        <div class="doc-section" id="privacy">
+            <h2><span class="num">8</span> Privacy</h2>
+            <p>Your use of BarterBrain is also governed by our <a href="/privacy">Privacy Policy</a>, which is incorporated into these Terms by reference. Please review our Privacy Policy to understand our practices.</p>
+        </div>
+
+        <div class="doc-section" id="termination">
+            <h2><span class="num">9</span> Termination</h2>
+            <p>We reserve the right to suspend or terminate your account at any time for violations of these Terms, or for any other reason at our sole discretion. You may delete your account at any time by contacting us.</p>
+        </div>
+
+        <div class="doc-section" id="liability">
+            <h2><span class="num">10</span> Limitation of Liability</h2>
+            <p>BarterBrain is provided "as is" without warranties of any kind. To the fullest extent permitted by law, BarterBrain shall not be liable for any indirect, incidental, or consequential damages arising from your use of the platform.</p>
+        </div>
+
+        <div class="doc-section" id="contact-terms">
+            <h2><span class="num">11</span> Contact</h2>
+            <p>If you have questions about these Terms of Service, please contact us:</p>
+            <ul>
+                <li>Email: legal@barterbrain.com</li>
+                <li>Through the <a href="/help">Help Center</a></li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<%- include('partials/footer') %>

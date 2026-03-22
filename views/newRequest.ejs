@@ -14,7 +14,6 @@
 
     .page-wrap { max-width:680px; margin:0 auto; padding:48px 28px 100px; }
 
-    /* Breadcrumb */
     .breadcrumb {
         display:flex; align-items:center; gap:8px;
         font-size:0.78rem; color:var(--muted); margin-bottom:28px;
@@ -23,10 +22,8 @@
     .breadcrumb a:hover { color:var(--il); }
     .breadcrumb i { font-size:0.7rem; opacity:.5; }
 
-    /* Form card */
     .form-card {
-        background:var(--bg-1); border:1px solid var(--border);
-        border-radius:22px; overflow:hidden;
+        background:var(--bg-1); border:1px solid var(--border); border-radius:22px; overflow:hidden;
     }
 
     .form-card-header {
@@ -46,12 +43,10 @@
         font-family:'Sora',sans-serif; font-size:1.25rem; font-weight:800;
         letter-spacing:-0.4px; color:var(--text); margin-bottom:3px;
     }
-
     .form-card-header p { font-size:0.82rem; color:var(--muted); }
 
     .form-body { padding:32px; }
 
-    /* Error */
     .error-alert {
         background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.22);
         border-left:3px solid #ef4444; color:#fca5a5; padding:12px 16px;
@@ -59,7 +54,6 @@
         display:flex; align-items:center; gap:10px;
     }
 
-    /* Field */
     .field-group { margin-bottom:22px; }
 
     .field-label {
@@ -82,7 +76,6 @@
     }
 
     textarea.form-control { padding:12px 14px; resize:vertical; min-height:110px; }
-
     .form-control::placeholder { color:rgba(122,122,154,0.4); }
 
     .form-control:focus, .form-select:focus {
@@ -97,10 +90,7 @@
     }
     .form-select option { background:#1a1a2e; color:var(--text); }
 
-    /* Actions row */
-    .form-actions {
-        display:flex; gap:10px; margin-top:8px;
-    }
+    .form-actions { display:flex; gap:10px; margin-top:8px; }
 
     .btn-submit {
         flex:1; display:flex; align-items:center; justify-content:center; gap:8px;
@@ -119,6 +109,26 @@
         padding:13px 22px; border-radius:11px; transition:all .2s;
     }
     .btn-cancel:hover { background:rgba(255,255,255,0.07); color:var(--text); }
+
+    .skill-suggestions {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .skill-suggestions span {
+        background: rgba(79,70,229,0.1);
+        border: 1px solid rgba(79,70,229,0.2);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .skill-suggestions span:hover {
+        background: rgba(79,70,229,0.2);
+        border-color: rgba(79,70,229,0.4);
+    }
 
     @media(max-width:640px){ .page-wrap{padding:24px 14px 80px;} .form-body{padding:22px;} .form-card-header{padding:22px;} }
 </style>
@@ -148,24 +158,45 @@
 
             <form action="/requests" method="POST">
                 <div class="field-group">
-                    <label class="field-label" for="skill_id">Select Skill</label>
+                    <label class="field-label" for="skill_name">Skill Name *</label>
                     <div class="field-wrap">
-                        <select name="skill_id" id="skill_id" class="form-select" required>
-                            <option value="">— Choose a skill —</option>
-                            <% skills.forEach(skill => { %>
-                                <option value="<%= skill.skill_id %>">
-                                    <%= skill.skill_name %> (<%= skill.category_name || 'Uncategorized' %>)
+                        <input type="text" name="skill_name" id="skill_name" class="form-control" 
+                               placeholder="e.g., JavaScript, Guitar, Spanish, Photography..."
+                               value="<%= locals.formData ? formData.skill_name : '' %>" required>
+                        <i class="bi bi-tag field-icon"></i>
+                    </div>
+                    <div class="skill-suggestions">
+                        <span onclick="document.getElementById('skill_name').value='JavaScript'">JavaScript</span>
+                        <span onclick="document.getElementById('skill_name').value='Python'">Python</span>
+                        <span onclick="document.getElementById('skill_name').value='React'">React</span>
+                        <span onclick="document.getElementById('skill_name').value='Guitar'">Guitar</span>
+                        <span onclick="document.getElementById('skill_name').value='Spanish'">Spanish</span>
+                        <span onclick="document.getElementById('skill_name').value='Tennis'">Tennis</span>
+                        <span onclick="document.getElementById('skill_name').value='Digital Art'">Digital Art</span>
+                        <span onclick="document.getElementById('skill_name').value='Yoga'">Yoga</span>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="category_id">Category (Optional)</label>
+                    <div class="field-wrap">
+                        <select name="category_id" id="category_id" class="form-select">
+                            <option value="">-- Select a category (optional) --</option>
+                            <% categories.forEach(cat => { %>
+                                <option value="<%= cat.category_id %>"
+                                    <%= locals.formData && formData.category_id == cat.category_id ? 'selected' : '' %>>
+                                    <%= cat.category_name %>
                                 </option>
                             <% }) %>
                         </select>
-                        <i class="bi bi-mortarboard field-icon"></i>
+                        <i class="bi bi-folder field-icon"></i>
                     </div>
                 </div>
 
                 <div class="field-group">
                     <label class="field-label" for="description">Description <span style="text-transform:none;letter-spacing:0;font-weight:400;color:rgba(122,122,154,0.6);">(optional)</span></label>
                     <textarea name="description" id="description" class="form-control"
-                        placeholder="Describe your current level, what you want to achieve, preferred teaching style…"></textarea>
+                        placeholder="Describe your current level, what you want to achieve, preferred teaching style…"><%= locals.formData ? formData.description : '' %></textarea>
                 </div>
 
                 <div class="form-actions">

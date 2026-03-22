@@ -1,9 +1,247 @@
     </main>
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 BarterBrain - Skill Barter Platform. All rights reserved.</p>
+
+    <footer class="bb-footer">
+        <div class="footer-inner">
+
+            <!-- Top row -->
+            <div class="footer-top">
+                <div class="footer-brand-col">
+                    <a href="/dashboard" class="footer-logo">BarterBrain</a>
+                    <p class="footer-tagline">Exchange skills, not money. A global community of learners and teachers sharing knowledge — completely free.</p>
+                    <div class="footer-socials">
+                        <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-links-group">
+                    <div class="footer-col">
+                        <h4>Platform</h4>
+                        <ul>
+                            <li><a href="/dashboard">Dashboard</a></li>
+                            <li><a href="/offers/all">Browse Offers</a></li>
+                            <li><a href="/offers">My Offers</a></li>
+                            <li><a href="/requests">My Requests</a></li>
+                            <li><a href="/matches">Matches</a></li>
+                            <li><a href="/availability">Availability</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Account</h4>
+                        <ul>
+                            <li><a href="/profile">My Profile</a></li>
+                            <li><a href="/register">Sign Up</a></li>
+                            <li><a href="/login">Login</a></li>
+                            <li><a href="/logout">Logout</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="/about">About Us</a></li>
+                            <li><a href="/features">Features</a></li>
+                            <li><a href="/contact">Contact</a></li>
+                            <li><a href="/help">Help Center</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Legal</h4>
+                        <ul>
+                            <li><a href="/terms">Terms of Service</a></li>
+                            <li><a href="/privacy">Privacy Policy</a></li>
+                            <li><a href="/cookie-policy">Cookie Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="footer-divider"></div>
+
+            <!-- Bottom row -->
+            <div class="footer-bottom">
+                <p class="footer-copy">&copy; 2024 BarterBrain — Skill Barter Platform. All rights reserved.</p>
+                <p class="footer-made">Made with <i class="bi bi-heart-fill" style="color:#ef4444; font-size:0.75rem;"></i> for skill exchangers everywhere.</p>
+            </div>
+
         </div>
     </footer>
+
+    <style>
+        .bb-footer {
+            background: #0a0a16;
+            border-top: 1px solid rgba(255,255,255,0.065);
+            margin-top: auto;
+        }
+
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 56px 28px 28px;
+        }
+
+        /* Top row */
+        .footer-top {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 60px;
+            margin-bottom: 48px;
+        }
+
+        /* Brand col */
+        .footer-logo {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(120deg, #818cf8, #a78bfa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            margin-bottom: 14px;
+            text-decoration: none;
+        }
+
+        .footer-tagline {
+            font-size: 0.83rem;
+            color: #5a5a78;
+            line-height: 1.7;
+            margin-bottom: 22px;
+            max-width: 260px;
+        }
+
+        .footer-socials {
+            display: flex;
+            gap: 8px;
+        }
+
+        .footer-socials a {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5a5a78;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .footer-socials a:hover {
+            background: rgba(99,102,241,0.12);
+            border-color: rgba(99,102,241,0.3);
+            color: #818cf8;
+        }
+
+        /* Links group */
+        .footer-links-group {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+        }
+
+        .footer-col h4 {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #7a7a9a;
+            margin-bottom: 16px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .footer-col ul a {
+            font-size: 0.83rem;
+            color: #4a4a68;
+            text-decoration: none;
+            transition: color 0.2s;
+            display: inline-block;
+        }
+
+        .footer-col ul a:hover { color: #818cf8; }
+
+        /* Divider */
+        .footer-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.055);
+            margin-bottom: 24px;
+        }
+
+        /* Bottom row */
+        .footer-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .footer-copy,
+        .footer-made {
+            font-size: 0.78rem;
+            color: #3a3a58;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .footer-top { grid-template-columns: 1fr; gap: 40px; }
+            .footer-links-group { grid-template-columns: repeat(2, 1fr); }
+            .footer-tagline { max-width: 100%; }
+        }
+
+        @media (max-width: 540px) {
+            .footer-inner { padding: 40px 16px 24px; }
+            .footer-links-group { grid-template-columns: 1fr 1fr; gap: 28px; }
+            .footer-bottom { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+
     <script src="/js/script.js"></script>
+
+    <script>
+        /* Mobile nav toggle */
+        const navToggle = document.getElementById('nav-toggle');
+        const navDrawer = document.getElementById('nav-drawer');
+        if (navToggle && navDrawer) {
+            navToggle.addEventListener('click', () => {
+                navDrawer.classList.toggle('open');
+                const icon = navToggle.querySelector('i');
+                if (icon) icon.className = navDrawer.classList.contains('open') ? 'bi bi-x-lg' : 'bi bi-list';
+            });
+            /* Close drawer on outside click */
+            document.addEventListener('click', (e) => {
+                if (!navToggle.contains(e.target) && !navDrawer.contains(e.target)) {
+                    navDrawer.classList.remove('open');
+                    const icon = navToggle.querySelector('i');
+                    if (icon) icon.className = 'bi bi-list';
+                }
+            });
+        }
+
+        /* Highlight active nav link */
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-links a, .nav-drawer a').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    </script>
 </body>
 </html>

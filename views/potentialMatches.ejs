@@ -10,11 +10,24 @@
     }
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); }
-    a { text-decoration:none; }
+    a { text-decoration:none; color:inherit; }
 
     .page-wrap { max-width:1100px; margin:0 auto; padding:36px 28px 100px; }
 
-    .page-top { margin-bottom:36px; }
+    /* Breadcrumb */
+    .breadcrumb {
+        display:flex; align-items:center; gap:8px;
+        font-size:0.78rem; color:var(--muted); margin-bottom:24px;
+    }
+    .breadcrumb a { color:var(--muted); transition:color .2s; }
+    .breadcrumb a:hover { color:var(--il); }
+    .breadcrumb i { font-size:0.7rem; opacity:.5; }
+
+    /* Page top */
+    .page-top {
+        display:flex; align-items:flex-end; justify-content:space-between;
+        flex-wrap:wrap; gap:16px; margin-bottom:36px;
+    }
     .page-top h1 {
         font-family:'Sora',sans-serif; font-size:clamp(1.5rem,2.5vw,2rem);
         font-weight:800; letter-spacing:-0.8px; color:var(--text); margin-bottom:5px;
@@ -25,10 +38,16 @@
     }
     .page-sub { font-size:0.86rem; color:var(--muted); }
 
-    /* Request section */
-    .request-section {
-        margin-bottom:36px;
+    .btn-link {
+        display:inline-flex; align-items:center; gap:7px;
+        font-size:0.82rem; font-weight:600; color:var(--muted);
+        background:var(--bg-1); border:1px solid var(--border);
+        padding:8px 16px; border-radius:9px; transition:all .2s;
     }
+    .btn-link:hover { color:var(--il); border-color:rgba(99,102,241,0.3); background:rgba(79,70,229,0.06); }
+
+    /* Request section */
+    .request-section { margin-bottom:40px; }
 
     .req-header {
         background:linear-gradient(135deg,rgba(79,70,229,0.12),rgba(124,58,237,0.08));
@@ -36,82 +55,107 @@
         padding:20px 24px; margin-bottom:16px; display:flex;
         align-items:flex-start; gap:14px;
     }
-
     .req-icon {
         width:42px; height:42px; border-radius:11px;
         background:rgba(79,70,229,0.18); display:flex;
         align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;
     }
-
-    .req-info h2 {
-        font-family:'Sora',sans-serif; font-size:1rem; font-weight:700;
-        color:var(--text); margin-bottom:4px;
-    }
-
-    .req-info p { font-size:0.82rem; color:var(--muted); line-height:1.5; }
-
     .req-info .req-label {
         font-size:0.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
         color:var(--il); margin-bottom:5px; display:block;
     }
+    .req-info h2 {
+        font-family:'Sora',sans-serif; font-size:1rem; font-weight:700;
+        color:var(--text); margin-bottom:4px;
+    }
+    .req-info p { font-size:0.82rem; color:var(--muted); line-height:1.5; }
 
-    /* Matching offers sub-heading */
+    /* Offers count label */
     .offers-label {
         font-size:0.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
         color:var(--muted); margin-bottom:12px; display:flex; align-items:center; gap:8px;
     }
-    .offers-label::after {
-        content:''; flex:1; height:1px; background:var(--border);
-    }
+    .offers-label::after { content:''; flex:1; height:1px; background:var(--border); }
 
     /* Offers grid */
     .offers-list {
-        display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px;
+        display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:12px;
     }
 
     .offer-card {
         background:var(--bg-1); border:1px solid var(--border); border-radius:14px;
-        padding:18px; display:flex; flex-direction:column; gap:10px;
-        transition:border-color .25s, transform .25s, box-shadow .25s;
+        padding:20px; display:flex; flex-direction:column; gap:12px;
+        transition:border-color .25s, transform .25s, box-shadow .25s; position:relative; overflow:hidden;
+    }
+    .offer-card::before {
+        content:''; position:absolute; top:0; left:0; right:0; height:1px;
+        background:linear-gradient(90deg,transparent,rgba(99,102,241,0.35),transparent);
+        opacity:0; transition:opacity .25s;
     }
     .offer-card:hover {
         border-color:rgba(99,102,241,0.25); transform:translateY(-3px);
-        box-shadow:0 12px 32px rgba(0,0,0,0.3);
+        box-shadow:0 14px 36px rgba(0,0,0,0.3);
     }
+    .offer-card:hover::before { opacity:1; }
 
-    .offer-card h4 {
+    /* Offer card top — avatar + name */
+    .offer-top {
+        display:flex; align-items:center; gap:12px;
+    }
+    .offer-avatar {
+        width:40px; height:40px; border-radius:11px; flex-shrink:0;
+        background:linear-gradient(135deg,rgba(79,70,229,0.3),rgba(124,58,237,0.25));
+        border:1px solid rgba(99,102,241,0.3);
+        display:flex; align-items:center; justify-content:center;
+        font-family:'Sora',sans-serif; font-size:1rem; font-weight:800; color:#c4b5fd;
+    }
+    .offer-name-wrap h4 {
         font-family:'Sora',sans-serif; font-size:0.9rem; font-weight:700;
-        color:var(--text); margin-bottom:2px;
+        color:var(--text); margin-bottom:3px;
+    }
+    .offer-user-sub {
+        display:flex; align-items:center; gap:5px;
+        font-size:0.73rem; color:var(--muted);
+    }
+    .offer-user-sub i { color:var(--il); opacity:.6; font-size:0.72rem; }
+
+    .offer-desc {
+        font-size:0.79rem; color:var(--muted); line-height:1.6; flex:1;
     }
 
-    .offer-user {
-        display:flex; align-items:center; gap:6px;
-        font-size:0.76rem; color:var(--muted);
+    /* Card actions row */
+    .offer-actions {
+        display:flex; gap:8px; margin-top:2px;
     }
-    .offer-user i { color:var(--il); opacity:.6; font-size:0.8rem; }
-
-    .offer-card p.desc {
-        font-size:0.8rem; color:var(--muted); line-height:1.55; flex:1;
-    }
-
-    .offer-card form { margin:0; }
+    .offer-actions form { flex:1; margin:0; }
 
     .btn-match {
         width:100%; display:flex; align-items:center; justify-content:center; gap:7px;
-        background:linear-gradient(135deg,#4f46e5,#7c3aed);
-        color:#fff; font-family:'Sora',sans-serif; font-size:0.82rem; font-weight:700;
+        background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff;
+        font-family:'Sora',sans-serif; font-size:0.8rem; font-weight:700;
         padding:10px; border-radius:9px; border:none; cursor:pointer;
-        box-shadow:0 0 20px rgba(79,70,229,0.3); transition:all .25s;
+        box-shadow:0 0 18px rgba(79,70,229,0.28); transition:all .25s;
     }
-    .btn-match:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(79,70,229,0.45); }
+    .btn-match:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(79,70,229,0.45); }
 
+    .btn-profile {
+        display:flex; align-items:center; justify-content:center; gap:6px;
+        background:rgba(129,140,248,0.1); border:1px solid rgba(99,102,241,0.22);
+        color:var(--il); font-size:0.8rem; font-weight:700;
+        padding:10px 14px; border-radius:9px; cursor:pointer;
+        transition:all .2s; white-space:nowrap; flex-shrink:0;
+    }
+    .btn-profile:hover { background:rgba(129,140,248,0.2); border-color:rgba(99,102,241,0.4); transform:translateY(-1px); }
+
+    /* No offers */
     .no-offers {
         background:var(--bg-1); border:1px dashed rgba(255,255,255,0.07);
-        border-radius:12px; padding:22px; text-align:center;
+        border-radius:12px; padding:24px; text-align:center;
         font-size:0.82rem; color:var(--muted);
+        display:flex; align-items:center; justify-content:center; gap:8px;
     }
 
-    /* empty state */
+    /* Empty state */
     .empty-wrap {
         display:flex; flex-direction:column; align-items:center;
         justify-content:center; padding:80px 20px; text-align:center; gap:16px;
@@ -132,18 +176,41 @@
     }
     .btn-new:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(79,70,229,0.5); color:#fff; }
 
-    @media(max-width:640px){ .page-wrap{padding:22px 14px 80px;} }
+    @media(max-width:640px){
+        .page-wrap { padding:22px 14px 80px; }
+        .offers-list { grid-template-columns:1fr; }
+        .offer-actions { flex-direction:column; }
+        .btn-profile { width:100%; }
+    }
 </style>
 
 <div class="page-wrap">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="/dashboard"><i class="bi bi-grid-fill"></i> Dashboard</a>
+        <i class="bi bi-chevron-right"></i>
+        <a href="/matches">My Matches</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>Find Matches</span>
+    </div>
+
+    <!-- Page top -->
     <div class="page-top">
-        <h1>Potential <span>Matches</span></h1>
-        <p class="page-sub">Skill offers that align with your learning requests.</p>
+        <div>
+            <h1>Potential <span>Matches</span></h1>
+            <p class="page-sub">Skill offers that align with your learning requests.</p>
+        </div>
+        <a href="/matches" class="btn-link">
+            <i class="bi bi-arrow-left"></i> Back to Matches
+        </a>
     </div>
 
     <% if (locals.potentialMatches && potentialMatches.length > 0) { %>
         <% potentialMatches.forEach(item => { %>
             <div class="request-section">
+
+                <!-- Request header -->
                 <div class="req-header">
                     <div class="req-icon">📋</div>
                     <div class="req-info">
@@ -160,25 +227,47 @@
                     <div class="offers-list">
                         <% item.offers.forEach(offer => { %>
                             <div class="offer-card">
-                                <div>
-                                    <h4><%= offer.full_name %></h4>
-                                    <div class="offer-user">
-                                        <i class="bi bi-person-circle"></i> Skill match for your request
+
+                                <!-- Avatar + name -->
+                                <div class="offer-top">
+                                    <div class="offer-avatar">
+                                        <%= offer.full_name ? offer.full_name.charAt(0).toUpperCase() : '?' %>
+                                    </div>
+                                    <div class="offer-name-wrap">
+                                        <h4><%= offer.full_name %></h4>
+                                        <div class="offer-user-sub">
+                                            <i class="bi bi-patch-check-fill"></i> Matches your request
+                                        </div>
                                     </div>
                                 </div>
-                                <p class="desc"><%= offer.description || 'No description provided' %></p>
-                                <form action="/matches/create" method="POST">
-                                    <input type="hidden" name="offerId"   value="<%= offer.offer_id %>">
-                                    <input type="hidden" name="requestId" value="<%= item.request.request_id %>">
-                                    <button type="submit" class="btn-match">
-                                        <i class="bi bi-lightning-charge-fill"></i> Create Match
-                                    </button>
-                                </form>
+
+                                <!-- Description -->
+                                <p class="offer-desc">
+                                    <%= offer.description || 'No description provided' %>
+                                </p>
+
+                                <!-- Action buttons -->
+                                <div class="offer-actions">
+                                    <form action="/matches/create" method="POST">
+                                        <input type="hidden" name="offerId"   value="<%= offer.offer_id %>">
+                                        <input type="hidden" name="requestId" value="<%= item.request.request_id %>">
+                                        <button type="submit" class="btn-match">
+                                            <i class="bi bi-lightning-charge-fill"></i> Create Match
+                                        </button>
+                                    </form>
+                                    <a href="/user/<%= offer.user_id %>" class="btn-profile">
+                                        <i class="bi bi-person-fill"></i> Profile
+                                    </a>
+                                </div>
+
                             </div>
                         <% }) %>
                     </div>
                 <% } else { %>
-                    <div class="no-offers">No matching offers found for this request yet.</div>
+                    <div class="no-offers">
+                        <i class="bi bi-search" style="opacity:.4;"></i>
+                        No matching offers found for this request yet.
+                    </div>
                 <% } %>
             </div>
         <% }) %>
@@ -187,9 +276,12 @@
             <div class="empty-icon-big">🔍</div>
             <h3>No requests to match</h3>
             <p>Create a skill request first, and we'll find people who can teach you!</p>
-            <a href="/requests/new" class="btn-new"><i class="bi bi-plus-lg"></i> Create a Request</a>
+            <a href="/requests/new" class="btn-new">
+                <i class="bi bi-plus-lg"></i> Create a Request
+            </a>
         </div>
     <% } %>
+
 </div>
 
 <%- include('partials/footer') %>
