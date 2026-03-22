@@ -2,24 +2,41 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const cookieParser = require('cookie-parser'); // Add this
 
 const app = express();
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser()); // Add this
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session configuration - UPDATED for production
+// Session configuration - FIXED for production
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
     resave: false,
     saveUninitialized: false,
+    proxy: true,  // Add this - trust Render's proxy
     cookie: { 
-        secure: process.env.NODE_ENV === 'production', // true for HTTPS
-        maxAge: 1000 * 60 * 60 * 24 // 24 hours
-    }
+        secure: true,  // Force true since Render uses HTTPS
+        httpOnly: true,
+        sameSite: 'lax',  // Add this for redirects
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+    },
+    name: 'barterbrain.sid'  // Add custom cookie name
 }));
+
+// Debug middleware - Add this to see what's happening
+app.use((req, res, next) => {
+    console.log('=== DEBUG ===');
+    console.log('URL:', req.url);
+    console.log('Session ID:', req.sessionID);
+    console.log('User ID in session:', req.session.userId);
+    console.log('Cookies received:', req.cookies);
+    console.log('=============');
+    next();
+});
 
 // Set view engine
 app.set('view engine', 'ejs');
@@ -56,9 +73,15 @@ app.get('/', (req, res) => {
     }
 });
 
-// Dashboard
+// Dashboard - Only one instance needed
 app.get('/dashboard', (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
+    console.log('Dashboard route hit, userId:', req.session.userId);
+    console.log('Session ID:', req.sessionID);
+    
+    if (!req.session.userId) {
+        console.log('No userId in session, redirecting to login');
+        return res.redirect('/login');
+    }
     res.render('dashboard', { user: req.session.user });
 });
 
@@ -94,19 +117,6 @@ app.get('/health', (req, res) => {
         timestamp: new Date().toISOString(),
         uptime: process.uptime()
     });
-});
-
-
-// Dashboard
-app.get('/dashboard', (req, res) => {
-    console.log('Dashboard route hit, userId:', req.session.userId);
-    console.log('Session:', req.session);
-    
-    if (!req.session.userId) {
-        console.log('No userId in session, redirecting to login');
-        return res.redirect('/login');
-    }
-    res.render('dashboard', { user: req.session.user });
 });
 
 const PORT = process.env.PORT || 3000;
