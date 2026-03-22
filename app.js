@@ -10,12 +10,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session configuration
+// Session configuration - UPDATED for production
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // set to true if using HTTPS
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production', // true for HTTPS
+        maxAge: 1000 * 60 * 60 * 24 // 24 hours
+    }
 }));
 
 // Set view engine
@@ -32,6 +35,8 @@ const userRoutes = require('./routes/userRoutes');
 const apiRoutes = require('./routes/apiRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const searchRoutes = require('./routes/searchRoutes');
+
+// Register routes
 app.use('/user', userRoutes);
 app.use('/', authRoutes);
 app.use('/offers', offerRoutes);
@@ -42,7 +47,6 @@ app.use('/api', apiRoutes);
 app.use('/profile', profileRoutes);
 app.use('/search', searchRoutes);
 
-// Home route – redirect to dashboard or login
 // Home route
 app.get('/', (req, res) => {
     if (req.session.userId) {
@@ -52,44 +56,44 @@ app.get('/', (req, res) => {
     }
 });
 
+// Dashboard
+app.get('/dashboard', (req, res) => {
+    if (!req.session.userId) return res.redirect('/login');
+    res.render('dashboard', { user: req.session.user });
+});
 
+// Static pages
 app.get('/about', (req, res) => {
     res.render('about');
 });
- 
-// Features  →  views/features.ejs
+
 app.get('/features', (req, res) => {
     res.render('features');
 });
- 
-// Terms of Service  →  views/terms.ejs
+
 app.get('/terms', (req, res) => {
     res.render('terms');
 });
- 
-// Privacy Policy  →  views/privacy.ejs
+
 app.get('/privacy', (req, res) => {
     res.render('privacy');
 });
- 
-// Cookie Policy  →  views/cookie-policy.ejs
+
 app.get('/cookie-policy', (req, res) => {
     res.render('cookie-policy');
 });
- 
-// Help Center  →  views/help.ejs
+
 app.get('/help', (req, res) => {
     res.render('help');
 });
 
-
-
-// Dashboard
-app.get('/dashboard', (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
-    // Fetch user data and recent offers/requests/matches
-    // For now, just render dashboard
-    res.render('dashboard', { user: req.session.user });
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
 });
 
 const PORT = process.env.PORT || 3000;

@@ -1,13 +1,29 @@
 const mysql = require('mysql2');
 
+// Create connection pool
 const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'admin',
-    database: process.env.DB_NAME || 'barterbrain',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT || 3306,
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    // For Render's MySQL, you might need SSL
+    ssl: process.env.DB_SSL === 'true' ? {
+        rejectUnauthorized: false
+    } : false
+});
+
+// Test connection
+pool.getConnection((err, connection) => {
+    if (err) {
+        console.error('Database connection failed:', err.message);
+    } else {
+        console.log('Database connected successfully');
+        connection.release();
+    }
 });
 
 module.exports = pool.promise();
