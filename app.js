@@ -2,38 +2,41 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
-const cookieParser = require('cookie-parser'); // Add this
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cookieParser()); // Add this
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session configuration - FIXED for production
+// Session configuration - WORKS FOR BOTH LOCAL AND PRODUCTION
+const isProduction = process.env.NODE_ENV === 'production';
+
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
     resave: false,
     saveUninitialized: false,
-    proxy: true,  // Add this - trust Render's proxy
+    proxy: isProduction,  // Only trust proxy in production
     cookie: { 
-        secure: true,  // Force true since Render uses HTTPS
+        secure: isProduction,  // Only secure in production (HTTPS)
         httpOnly: true,
-        sameSite: 'lax',  // Add this for redirects
+        sameSite: isProduction ? 'none' : 'lax',  // 'none' for cross-site, 'lax' for local
         maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
     },
-    name: 'barterbrain.sid'  // Add custom cookie name
+    name: 'barterbrain.sid'
 }));
 
-// Debug middleware - Add this to see what's happening
+// Debug middleware
 app.use((req, res, next) => {
     console.log('=== DEBUG ===');
     console.log('URL:', req.url);
     console.log('Session ID:', req.sessionID);
     console.log('User ID in session:', req.session.userId);
     console.log('Cookies received:', req.cookies);
+    console.log('NODE_ENV:', process.env.NODE_ENV);
     console.log('=============');
     next();
 });
@@ -73,7 +76,7 @@ app.get('/', (req, res) => {
     }
 });
 
-// Dashboard - Only one instance needed
+// Dashboard
 app.get('/dashboard', (req, res) => {
     console.log('Dashboard route hit, userId:', req.session.userId);
     console.log('Session ID:', req.sessionID);

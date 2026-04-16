@@ -32,13 +32,18 @@ exports.postLogin = async (req, res) => {
             email: user.email 
         };
         
-        // Save session before redirecting
+        // Save session explicitly
         req.session.save((err) => {
             if (err) {
                 console.error('Session save error:', err);
                 return res.render('login', { error: 'Login failed. Please try again.' });
             }
-            console.log('Session saved, redirecting to dashboard');
+            
+            console.log('Session saved successfully!');
+            console.log('Session ID:', req.sessionID);
+            console.log('User ID in session:', req.session.userId);
+            
+            // Redirect to dashboard
             res.redirect('/dashboard');
         });
         
