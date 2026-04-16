@@ -1,67 +1,83 @@
-const db = require('../config/db');
-
-class SkillModel {
-    static async getAll() {
-        const [rows] = await db.execute(`
-            SELECT s.*, c.category_name 
-            FROM skills s
-            LEFT JOIN categories c ON s.category_id = c.category_id
-            ORDER BY c.category_name, s.skill_name
-        `);
-        return rows;
-    }
-
-    static async getByCategory(categoryId) {
-        const [rows] = await db.execute(
-            'SELECT * FROM skills WHERE category_id = ?',
-            [categoryId]
-        );
-        return rows;
-    }
-
-    static async findById(skillId) {
-        const [rows] = await db.execute(
-            'SELECT * FROM skills WHERE skill_id = ?',
-            [skillId]
-        );
-        return rows[0];
-    }
-
-    static async findByName(skillName) {
-        const [rows] = await db.execute(
-            'SELECT * FROM skills WHERE skill_name = ?',
-            [skillName.trim()]
-        );
-        return rows[0];
-    }
-
-    static async findOrCreate(skillName, categoryId = null) {
-        // Trim and normalise skill name (capitalise first letter)
-        const cleanName = skillName.trim().charAt(0).toUpperCase() + skillName.trim().slice(1).toLowerCase();
-
-        // Try to find existing skill
-        let skill = await this.findByName(cleanName);
-        if (skill) return skill.skill_id;
-
-        // Create new skill - ensure categoryId is null if not provided
-        const finalCategoryId = (categoryId === null || categoryId === undefined || categoryId === '') 
-            ? null 
-            : parseInt(categoryId);
+// UPDATED: Get potential matches with fuzzy skill matching
+exports.getPotentialMatches = async (req, res) => {
+    try {
+        const db = require('../config/db');
+        const RequestModel = require('../models/requestModel');
+        const SkillModel = require('../models/skillModel');
         
-        const [result] = await db.execute(
-            'INSERT INTO skills (skill_name, category_id, is_custom) VALUES (?, ?, ?)',
-            [cleanName, finalCategoryId, true]
-        );
-        return result.insertId;
+        const userRequests = await RequestModel.findByUser(req.session.userId);
+        
+        const potentialMatches = [];
+        
+        for (const request of userRequests) {
+            // Get the request skill details
+            const requestSkill = await SkillModel.findById(request.skill_id);
+            const requestSkillName = requestSkill?.skill_name || '';
+            
+            // Find matching offers using fuzzy search
+            const [offers] = await db.execute(`
+                SELECT 
+                    o.offer_id,
+                    o.user_id,
+                    o.description,
+                    u.full_name,
+                    u.username,
+                    u.reputation_score,
+                    s.skill_name,
+                    s.skill_id
+                FROM offers o
+                JOIN users u ON o.user_id = u.user_id
+                JOIN skills s ON o.skill_id = s.skill_id
+                WHERE (
+                    -- Exact match
+                    LOWER(s.skill_name) = LOWER(?)
+                    OR
+                    -- Partial match (skill contains keyword)
+                    LOWER(s.skill_name) LIKE CONCAT('%', LOWER(?), '%')
+                    OR
+                    -- Keyword contains skill name
+                    LOWER(?) LIKE CONCAT('%', LOWER(s.skill_name), '%')
+                    OR
+                    -- Word-by-word matching for multi-word skills
+                    LOWER(s.skill_name) REGEXP REPLACE(LOWER(?), ' ', '|')
+                )
+                AND o.user_id != ?
+                AND NOT EXISTS (
+                    SELECT 1 FROM matches 
+                    WHERE offer_id = o.offer_id AND request_id = ?
+                )
+                ORDER BY 
+                    CASE 
+                        WHEN LOWER(s.skill_name) = LOWER(?) THEN 1
+                        WHEN LOWER(s.skill_name) LIKE CONCAT('%', LOWER(?), '%') THEN 2
+                        ELSE 3
+                    END
+            `, [
+                requestSkillName, 
+                requestSkillName, 
+                requestSkillName,
+                requestSkillName,
+                req.session.userId, 
+                request.request_id,
+                requestSkillName,
+                requestSkillName
+            ]);
+            
+            if (offers.length > 0) {
+                potentialMatches.push({
+                    request: request,
+                    offers: offers
+                });
+            }
+        }
+        
+        res.render('potentialMatches', { 
+            potentialMatches, 
+            user: req.session.user 
+        });
+        
+    } catch (err) {
+        console.error('Error loading potential matches:', err);
+        res.status(500).send('Error loading potential matches: ' + err.message);
     }
-
-    static async create(skillName, categoryId) {
-        const [result] = await db.execute(
-            'INSERT INTO skills (skill_name, category_id) VALUES (?, ?)',
-            [skillName, categoryId]
-        );
-        return result.insertId;
-    }
-}
-
-module.exports = SkillModel;
+};
