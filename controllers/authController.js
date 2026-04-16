@@ -43,8 +43,8 @@ exports.postLogin = async (req, res) => {
             console.log('Session ID:', req.sessionID);
             console.log('User ID in session:', req.session.userId);
             
-            // Redirect to dashboard
-            res.redirect('/dashboard');
+            // Redirect to WELCOME page instead of direct dashboard
+            res.redirect('/welcome');
         });
         
     } catch (err) {

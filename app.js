@@ -101,6 +101,14 @@ app.get('/terms', (req, res) => {
     res.render('terms');
 });
 
+// Welcome page (after login)
+app.get('/welcome', (req, res) => {
+    if (!req.session.userId) {
+        return res.redirect('/login');
+    }
+    res.render('welcome', { user: req.session.user });
+});
+
 app.get('/privacy', (req, res) => {
     res.render('privacy');
 });

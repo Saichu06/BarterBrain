@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome | BarterBrain</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --gold:#FFD700;
+  --gold2:#FF8C00;
+  --purple:#7c3aed;
+  --purple2:#4f35c2;
+  --cyan:#00e5ff;
+  --dark:#04020f;
+  --red:#ff2244;
+}
+
+body{
+  font-family:'Rajdhani',sans-serif;
+  background:var(--dark);
+  min-height:100vh;
+  overflow:hidden;
+  position:relative;
+}
+
+/* ── CANVAS BACKGROUND ── */
+canvas#bg{position:fixed;inset:0;z-index:0;}
+
+/* ── PARTICLE BURST (crash shards) ── */
+.shard-layer{
+  position:fixed;inset:0;z-index:2;pointer-events:none;
+  perspective:800px;
+}
+
+/* ── MAIN STAGE ── */
+#stage{
+  position:fixed;inset:0;z-index:5;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+
+/* ── CINEMATIC BARS ── */
+.bar-top,.bar-bottom{
+  position:fixed;left:0;right:0;
+  background:#000;
+  z-index:20;
+  transition:height 0.8s cubic-bezier(0.77,0,0.18,1);
+}
+.bar-top{top:0;height:120px;}
+.bar-bottom{bottom:0;height:120px;}
+.bars-open .bar-top{height:0;}
+.bars-open .bar-bottom{height:0;}
+
+/* ── CRASH PANELS (4 sides) ── */
+.panel{
+  position:fixed;z-index:15;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  transition:transform 0.9s cubic-bezier(0.77,0,0.18,1);
+}
+.panel-left{
+  left:0;top:0;bottom:0;width:50%;
+  background:linear-gradient(135deg,#0a0020 0%,#1a0040 100%);
+  transform:translateX(-100%);
+  border-right:3px solid var(--gold);
+}
+.panel-right{
+  right:0;top:0;bottom:0;width:50%;
+  background:linear-gradient(225deg,#0a0020 0%,#1a0040 100%);
+  transform:translateX(100%);
+  border-left:3px solid var(--gold);
+}
+.panel-top{
+  top:0;left:0;right:0;height:50%;
+  background:linear-gradient(180deg,#080018 0%,#150035 100%);
+  transform:translateY(-100%);
+  border-bottom:3px solid var(--cyan);
+}
+.panel-bottom{
+  bottom:0;left:0;right:0;height:50%;
+  background:linear-gradient(0deg,#080018 0%,#150035 100%);
+  transform:translateY(100%);
+  border-top:3px solid var(--cyan);
+}
+
+/* Panels crash IN */
+.crash-in .panel-left{transform:translateX(0);}
+.crash-in .panel-right{transform:translateX(0);}
+.crash-in .panel-top{transform:translateY(0);}
+.crash-in .panel-bottom{transform:translateY(0);}
+
+/* Panels explode OUT */
+.crash-out .panel-left{transform:translateX(-100%);}
+.crash-out .panel-right{transform:translateX(100%);}
+.crash-out .panel-top{transform:translateY(-100%);}
+.crash-out .panel-bottom{transform:translateY(100%);}
+
+/* ── RAJINI SILHOUETTE (CSS Art) ── */
+.rajini-wrap{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;
+  align-items:center;
+  animation:rajiniEntrance 0.5s cubic-bezier(0.22,1,0.36,1) both;
+  animation-delay:0.3s;
+}
+@keyframes rajiniEntrance{
+  0%{transform:translate(-50%,-50%) scale(0) rotate(-10deg);opacity:0;}
+  60%{transform:translate(-50%,-50%) scale(1.15) rotate(3deg);}
+  100%{transform:translate(-50%,-50%) scale(1) rotate(0deg);opacity:1;}
+}
+
+/* Sunburst behind Rajini */
+.sunburst{
+  position:absolute;
+  width:340px;height:340px;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  animation:spinBurst 8s linear infinite;
+}
+@keyframes spinBurst{from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);}}
+.sunburst::before{
+  content:'';position:absolute;inset:0;
+  background:conic-gradient(
+    rgba(255,215,0,0.18) 0deg 10deg, transparent 10deg 30deg,
+    rgba(255,215,0,0.18) 30deg 40deg, transparent 40deg 60deg,
+    rgba(255,215,0,0.18) 60deg 70deg, transparent 70deg 90deg,
+    rgba(255,215,0,0.18) 90deg 100deg, transparent 100deg 120deg,
+    rgba(255,215,0,0.18) 120deg 130deg, transparent 130deg 150deg,
+    rgba(255,215,0,0.18) 150deg 160deg, transparent 160deg 180deg,
+    rgba(255,215,0,0.18) 180deg 190deg, transparent 190deg 210deg,
+    rgba(255,215,0,0.18) 210deg 220deg, transparent 220deg 240deg,
+    rgba(255,215,0,0.18) 240deg 250deg, transparent 250deg 270deg,
+    rgba(255,215,0,0.18) 270deg 280deg, transparent 280deg 300deg,
+    rgba(255,215,0,0.18) 300deg 310deg, transparent 310deg 330deg,
+    rgba(255,215,0,0.18) 330deg 340deg, transparent 340deg 360deg
+  );
+  border-radius:50%;
+}
+
+/* The Rajini Figure */
+.rajini-figure{
+  position:relative;
+  width:160px;height:260px;
+  display:flex;flex-direction:column;
+  align-items:center;
+  filter:drop-shadow(0 0 30px rgba(255,215,0,0.6)) drop-shadow(0 0 60px rgba(124,58,237,0.4));
+  animation:superstarFloat 3s ease-in-out infinite;
+}
+@keyframes superstarFloat{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-12px);}
+}
+
+/* Sunglasses + hat combo */
+.raj-hat{
+  width:90px;height:18px;
+  background:linear-gradient(135deg,#1a0a00,#3d1a00);
+  border-radius:6px 6px 0 0;
+  border:2px solid var(--gold);
+  position:relative;
+  margin-bottom:0;
+  box-shadow:0 0 20px rgba(255,215,0,0.5);
+}
+.raj-hat::before{
+  content:'';position:absolute;
+  width:120px;height:8px;
+  background:var(--gold);
+  bottom:-4px;left:-15px;
+  border-radius:4px;
+  box-shadow:0 0 15px var(--gold);
+}
+
+/* Head */
+.raj-head{
+  width:72px;height:80px;
+  background:linear-gradient(160deg,#c4854a,#a0622e,#8b4f20);
+  border-radius:50% 50% 45% 45%;
+  position:relative;
+  box-shadow:
+    inset -8px -8px 20px rgba(0,0,0,0.5),
+    inset 4px 4px 12px rgba(255,200,100,0.2),
+    0 0 30px rgba(255,150,50,0.3);
+  margin-top:2px;
+}
+
+/* Hair */
+.raj-head::before{
+  content:'';position:absolute;
+  width:78px;height:28px;
+  background:linear-gradient(135deg,#1a1000,#2d1800);
+  top:-14px;left:-3px;
+  border-radius:50% 50% 20% 20%;
+  border-bottom:2px solid #8b6914;
+}
+
+/* Face features */
+.raj-face{
+  position:absolute;
+  top:24px;left:50%;
+  transform:translateX(-50%);
+  width:64px;
+}
+
+/* Sunglasses */
+.raj-glasses{
+  display:flex;gap:6px;
+  align-items:center;
+  margin-bottom:8px;
+}
+.glass-lens{
+  width:22px;height:14px;
+  background:linear-gradient(135deg,rgba(0,0,0,0.9),rgba(20,0,40,0.95));
+  border-radius:6px;
+  border:2px solid var(--gold);
+  box-shadow:0 0 10px rgba(255,215,0,0.5),inset 0 0 6px rgba(124,58,237,0.3);
+  position:relative;
+  overflow:hidden;
+}
+.glass-lens::after{
+  content:'';position:absolute;
+  width:8px;height:4px;
+  background:rgba(255,255,255,0.15);
+  top:3px;left:3px;
+  border-radius:3px;
+  transform:rotate(-20deg);
+}
+.glass-bridge{
+  width:6px;height:2px;
+  background:var(--gold);
+  box-shadow:0 0 6px var(--gold);
+}
+
+/* Mustache */
+.raj-mustache{
+  width:36px;height:10px;
+  background:linear-gradient(135deg,#1a0800,#2d1000);
+  border-radius:50%;
+  margin:0 auto;
+  position:relative;
+  box-shadow:inset 0 2px 4px rgba(255,150,0,0.1);
+}
+.raj-mustache::before,.raj-mustache::after{
+  content:'';position:absolute;
+  width:14px;height:7px;
+  background:#1a0800;
+  border-radius:50%;
+  top:-3px;
+}
+.raj-mustache::before{left:3px;}
+.raj-mustache::after{right:3px;}
+
+/* Grin */
+.raj-grin{
+  width:28px;height:8px;
+  border-bottom:3px solid rgba(200,120,60,0.8);
+  border-radius:0 0 20px 20px;
+  margin:4px auto 0;
+}
+
+/* Neck */
+.raj-neck{
+  width:28px;height:14px;
+  background:linear-gradient(160deg,#b57840,#8b5a25);
+  margin:0 auto;
+}
+
+/* Suit body */
+.raj-suit{
+  width:110px;height:110px;
+  background:linear-gradient(160deg,#0d0030,#1a0050,#0d0030);
+  border-radius:10px 10px 5px 5px;
+  position:relative;
+  box-shadow:
+    inset 0 4px 20px rgba(124,58,237,0.3),
+    0 0 20px rgba(124,58,237,0.2);
+}
+
+/* Suit lapels */
+.raj-suit::before{
+  content:'';position:absolute;
+  width:0;height:0;
+  border-left:20px solid transparent;
+  border-right:20px solid transparent;
+  border-top:40px solid #1a005a;
+  top:0;left:50%;
+  transform:translateX(-50%);
+  filter:drop-shadow(0 2px 4px rgba(124,58,237,0.4));
+}
+
+/* Shirt / tie center */
+.raj-suit::after{
+  content:'';position:absolute;
+  width:16px;height:55px;
+  background:linear-gradient(180deg,#f5f0e0,#e8d8a0);
+  top:5px;left:50%;
+  transform:translateX(-50%);
+  border-radius:2px 2px 8px 8px;
+  box-shadow:0 0 8px rgba(255,215,0,0.2);
+}
+
+/* Gold chain */
+.raj-chain{
+  position:absolute;
+  width:60px;height:20px;
+  border-bottom:3px solid var(--gold);
+  border-radius:0 0 30px 30px;
+  top:20px;left:50%;
+  transform:translateX(-50%);
+  box-shadow:0 4px 12px rgba(255,215,0,0.6);
+  z-index:2;
+}
+
+/* Shoulder badges */
+.raj-shoulder-l,.raj-shoulder-r{
+  position:absolute;
+  width:20px;height:20px;
+  background:var(--gold);
+  top:5px;
+  border-radius:50%;
+  box-shadow:0 0 15px var(--gold);
+}
+.raj-shoulder-l{left:5px;}
+.raj-shoulder-r{right:5px;}
+
+/* Arms */
+.raj-arm-l,.raj-arm-r{
+  position:absolute;
+  width:22px;height:75px;
+  background:linear-gradient(160deg,#0a0025,#150040);
+  border-radius:10px;
+  top:10px;
+  border:1px solid rgba(124,58,237,0.3);
+}
+.raj-arm-l{left:-24px;transform-origin:top center;animation:armL 3s ease-in-out infinite;}
+.raj-arm-r{right:-24px;transform-origin:top center;animation:armR 3s ease-in-out infinite;}
+@keyframes armL{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(10deg);}}
+@keyframes armR{0%,100%{transform:rotate(5deg);}50%{transform:rotate(-10deg);}}
+
+/* Hand with pointing finger */
+.raj-hand{
+  position:absolute;
+  width:18px;height:22px;
+  background:linear-gradient(160deg,#c4854a,#a0622e);
+  border-radius:8px 8px 4px 4px;
+  bottom:-18px;left:2px;
+}
+.raj-hand.point::after{
+  content:'';position:absolute;
+  width:6px;height:14px;
+  background:#b0702a;
+  border-radius:3px;
+  top:-10px;left:6px;
+  box-shadow:0 0 8px rgba(255,150,50,0.4);
+}
+
+/* Legs */
+.raj-legs{
+  display:flex;gap:12px;
+  margin-top:2px;
+}
+.raj-leg{
+  width:32px;height:55px;
+  background:linear-gradient(160deg,#0a0025,#150040);
+  border-radius:4px 4px 0 0;
+  border:1px solid rgba(124,58,237,0.2);
+  position:relative;
+}
+.raj-shoe{
+  width:38px;height:14px;
+  background:linear-gradient(135deg,#1a1000,#0d0800);
+  border-radius:4px 4px 6px 6px;
+  border:1px solid rgba(255,215,0,0.3);
+  margin-top:1px;
+  margin-left:-3px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.6);
+}
+
+/* Cigarette (classic Rajini style) */
+.raj-cig{
+  position:absolute;
+  right:-30px;top:50%;
+  width:28px;height:5px;
+  background:linear-gradient(90deg,#fff8e1,#f5deb3,#ff4400);
+  border-radius:2px;
+  transform:rotate(-15deg);
+  box-shadow:0 0 8px rgba(255,100,0,0.7);
+}
+.raj-cig::after{
+  content:'';position:absolute;
+  right:-4px;top:-2px;
+  width:8px;height:8px;
+  background:rgba(255,100,0,0.8);
+  border-radius:50%;
+  animation:emberGlow 0.5s ease-in-out infinite alternate;
+  box-shadow:0 0 12px rgba(255,100,0,1);
+}
+@keyframes emberGlow{
+  from{opacity:0.6;transform:scale(0.8);}
+  to{opacity:1;transform:scale(1.2);}
+}
+
+/* Smoke from cigarette */
+.smoke{
+  position:absolute;
+  right:-38px;top:40%;
+  display:flex;flex-direction:column;
+  gap:0;
+  pointer-events:none;
+}
+.smoke-puff{
+  width:8px;height:8px;
+  border-radius:50%;
+  background:rgba(200,180,160,0.3);
+  animation:smokeDrift 2s ease-out infinite;
+  margin:0 auto;
+}
+.smoke-puff:nth-child(1){animation-delay:0s;width:6px;height:6px;}
+.smoke-puff:nth-child(2){animation-delay:0.4s;width:9px;height:9px;}
+.smoke-puff:nth-child(3){animation-delay:0.8s;width:12px;height:12px;}
+@keyframes smokeDrift{
+  0%{transform:translate(0,0);opacity:0.4;}
+  100%{transform:translate(-15px,-30px) scale(2);opacity:0;}
+}
+
+/* ── NAME PLATE ── */
+.nameplate{
+  text-align:center;
+  margin-top:18px;
+  position:relative;
+}
+.superstar-tag{
+  font-family:'Orbitron',sans-serif;
+  font-size:11px;
+  letter-spacing:5px;
+  color:var(--gold);
+  text-transform:uppercase;
+  margin-bottom:4px;
+  animation:glimmer 2s ease-in-out infinite;
+}
+@keyframes glimmer{
+  0%,100%{opacity:1;text-shadow:0 0 10px var(--gold);}
+  50%{opacity:0.7;text-shadow:0 0 25px var(--gold),0 0 50px rgba(255,215,0,0.5);}
+}
+.rajini-name{
+  font-family:'Bebas Neue',cursive;
+  font-size:52px;
+  line-height:1;
+  background:linear-gradient(135deg,#fff5cc,#FFD700,#FF8C00,#FFD700,#fff5cc);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmer 3s linear infinite;
+  text-shadow:none;
+  filter:drop-shadow(0 0 20px rgba(255,215,0,0.5));
+}
+@keyframes shimmer{
+  0%{background-position:0% center;}
+  100%{background-position:200% center;}
+}
+.rajini-title{
+  font-family:'Rajdhani',sans-serif;
+  font-size:13px;
+  letter-spacing:3px;
+  color:rgba(255,215,0,0.6);
+  text-transform:uppercase;
+}
+
+/* ── WELCOME PANEL (shown after crash) ── */
+#welcome-panel{
+  position:fixed;inset:0;z-index:8;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.8s ease;
+}
+#welcome-panel.visible{opacity:1;pointer-events:all;}
+
+/* Main welcome card */
+.welcome-card{
+  background:rgba(8,2,25,0.92);
+  border:1px solid rgba(255,215,0,0.25);
+  border-radius:24px;
+  padding:40px 52px;
+  text-align:center;
+  max-width:580px;
+  width:90%;
+  position:relative;
+  overflow:hidden;
+  backdrop-filter:blur(20px);
+  box-shadow:
+    0 0 60px rgba(124,58,237,0.2),
+    0 0 120px rgba(255,215,0,0.05),
+    inset 0 1px 0 rgba(255,215,0,0.15);
+}
+
+/* Animated corner accents */
+.corner{
+  position:absolute;
+  width:30px;height:30px;
+  border-color:var(--gold);
+  border-style:solid;
+  opacity:0.7;
+}
+.corner-tl{top:12px;left:12px;border-width:2px 0 0 2px;border-radius:6px 0 0 0;}
+.corner-tr{top:12px;right:12px;border-width:2px 2px 0 0;border-radius:0 6px 0 0;}
+.corner-bl{bottom:12px;left:12px;border-width:0 0 2px 2px;border-radius:0 0 0 6px;}
+.corner-br{bottom:12px;right:12px;border-width:0 2px 2px 0;border-radius:0 0 6px 0;}
+
+/* Scan line effect */
+.welcome-card::before{
+  content:'';position:absolute;
+  width:100%;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,255,0.4),transparent);
+  top:0;left:0;
+  animation:scanLine 3s linear infinite;
+}
+@keyframes scanLine{
+  0%{top:0;opacity:1;}
+  100%{top:100%;opacity:0.2;}
+}
+
+.bb-logo{
+  font-family:'Orbitron',sans-serif;
+  font-size:11px;
+  letter-spacing:5px;
+  color:var(--cyan);
+  margin-bottom:16px;
+  opacity:0.8;
+}
+.welcome-greeting{
+  font-family:'Bebas Neue',cursive;
+  font-size:60px;
+  line-height:1;
+  background:linear-gradient(135deg,#ffffff,#e0d0ff,#ffffff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:4px;
+  letter-spacing:2px;
+}
+.user-name{
+  font-family:'Bebas Neue',cursive;
+  font-size:60px;
+  line-height:1;
+  background:linear-gradient(135deg,#FFD700,#FF8C00,#FFD700);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmer 2s linear infinite;
+  letter-spacing:2px;
+}
+.welcome-sub{
+  font-size:14px;
+  color:rgba(196,181,253,0.6);
+  letter-spacing:1px;
+  margin-top:10px;
+  margin-bottom:28px;
+}
+
+/* Rajini quote */
+.quote-box{
+  background:rgba(255,215,0,0.06);
+  border:1px solid rgba(255,215,0,0.2);
+  border-radius:12px;
+  padding:16px 20px;
+  margin-bottom:28px;
+  position:relative;
+}
+.quote-mark{
+  font-family:'Bebas Neue',cursive;
+  font-size:48px;
+  color:var(--gold);
+  opacity:0.3;
+  position:absolute;
+  top:-10px;left:12px;
+  line-height:1;
+}
+.quote-text{
+  font-family:'Rajdhani',sans-serif;
+  font-size:17px;
+  color:rgba(255,240,180,0.9);
+  font-style:italic;
+  font-weight:600;
+  line-height:1.5;
+}
+.quote-attr{
+  font-size:12px;
+  color:var(--gold);
+  letter-spacing:2px;
+  margin-top:6px;
+  opacity:0.7;
+}
+
+/* Tip cards */
+.tips-row{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:28px;
+}
+.tip{
+  background:rgba(124,58,237,0.08);
+  border:1px solid rgba(124,58,237,0.2);
+  border-radius:12px;
+  padding:14px 10px;
+  text-align:center;
+  transition:border-color 0.3s,background 0.3s;
+}
+.tip:hover{
+  border-color:rgba(255,215,0,0.4);
+  background:rgba(255,215,0,0.06);
+}
+.tip-icon{
+  font-size:20px;
+  margin-bottom:6px;
+  display:block;
+}
+.tip-name{
+  font-family:'Orbitron',sans-serif;
+  font-size:9px;
+  letter-spacing:1px;
+  color:var(--cyan);
+  margin-bottom:3px;
+  text-transform:uppercase;
+}
+.tip-desc{
+  font-size:11px;
+  color:rgba(196,181,253,0.5);
+  line-height:1.4;
+}
+
+/* Progress */
+.prog-label{
+  font-size:11px;
+  letter-spacing:3px;
+  color:rgba(255,215,0,0.4);
+  text-transform:uppercase;
+  margin-bottom:8px;
+  text-align:center;
+}
+.prog-track{
+  height:3px;
+  background:rgba(255,255,255,0.06);
+  border-radius:3px;
+  overflow:hidden;
+}
+.prog-fill{
+  height:100%;width:0;
+  background:linear-gradient(90deg,var(--purple2),var(--purple),var(--cyan));
+  border-radius:3px;
+  animation:loadBar 3s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+@keyframes loadBar{0%{width:0;}100%{width:100%;}}
+
+/* ── IMPACT TEXT (center crash moment) ── */
+#impact-text{
+  position:fixed;
+  inset:0;z-index:18;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+  opacity:0;
+}
+.impact-inner{
+  text-align:center;
+  transform:scale(0);
+  animation-fill-mode:both;
+}
+.impact-bb{
+  font-family:'Bebas Neue',cursive;
+  font-size:max(10vw,60px);
+  line-height:1;
+  background:linear-gradient(135deg,#FFD700,#FF8C00,#FFD700);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmer 1s linear infinite;
+  filter:drop-shadow(0 0 30px rgba(255,215,0,0.8));
+  letter-spacing:4px;
+}
+.impact-sub{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(10px,2vw,16px);
+  letter-spacing:8px;
+  color:var(--cyan);
+  margin-top:8px;
+}
+
+/* ── LIGHTNING STRIKE ── */
+#lightning{
+  position:fixed;inset:0;z-index:16;
+  pointer-events:none;
+  opacity:0;
+}
+
+/* ── SHOCKWAVE RING ── */
+.shockwave{
+  position:fixed;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%) scale(0);
+  width:100px;height:100px;
+  border-radius:50%;
+  border:4px solid rgba(255,215,0,0.8);
+  z-index:17;
+  opacity:0;
+}
+
+/* ── ORBIT RINGS ── */
+.orbit-layer{
+  position:fixed;inset:0;z-index:1;
+  pointer-events:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.orbit{
+  position:absolute;
+  border-radius:50%;
+  border:1px solid rgba(124,58,237,0.1);
+  animation:orbitSpin linear infinite;
+}
+.orbit:nth-child(1){width:500px;height:500px;animation-duration:25s;}
+.orbit:nth-child(2){width:750px;height:750px;animation-duration:40s;border-color:rgba(0,229,255,0.06);}
+.orbit:nth-child(3){width:1000px;height:1000px;animation-duration:65s;border-color:rgba(255,215,0,0.04);}
+@keyframes orbitSpin{from{transform:rotate(0);}to{transform:rotate(360deg);}}
+.orbit-dot{
+  position:absolute;
+  width:7px;height:7px;
+  border-radius:50%;
+  top:-3.5px;left:calc(50% - 3.5px);
+  background:var(--purple);
+  box-shadow:0 0 12px var(--purple);
+}
+.orbit:nth-child(2) .orbit-dot{background:var(--cyan);box-shadow:0 0 12px var(--cyan);}
+.orbit:nth-child(3) .orbit-dot{background:var(--gold);box-shadow:0 0 12px var(--gold);}
+
+@media(max-width:600px){
+  .welcome-card{padding:28px 24px;}
+  .welcome-greeting,.user-name{font-size:42px;}
+  .tips-row{grid-template-columns:1fr 1fr;gap:8px;}
+  .rajini-figure{width:120px;height:200px;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<!-- Orbit decoration -->
+<div class="orbit-layer">
+  <div class="orbit"><div class="orbit-dot"></div></div>
+  <div class="orbit"><div class="orbit-dot"></div></div>
+  <div class="orbit"><div class="orbit-dot"></div></div>
+</div>
+
+<!-- 4 crash panels -->
+<div class="panel panel-left" id="pl">
+  <!-- Rajini figure inside left panel -->
+  <div class="rajini-wrap" style="left:60%;top:50%;">
+    <div class="sunburst"></div>
+    <div class="rajini-figure">
+      <div class="raj-hat"></div>
+      <div class="raj-head">
+        <div class="raj-face">
+          <div class="raj-glasses">
+            <div class="glass-lens"></div>
+            <div class="glass-bridge"></div>
+            <div class="glass-lens"></div>
+          </div>
+          <div class="raj-mustache"></div>
+          <div class="raj-grin"></div>
+        </div>
+      </div>
+      <div class="raj-neck"></div>
+      <div class="raj-suit">
+        <div class="raj-arm-l"><div class="raj-hand point"></div></div>
+        <div class="raj-arm-r"><div class="raj-hand"></div></div>
+        <div class="raj-chain"></div>
+        <div class="raj-shoulder-l"></div>
+        <div class="raj-shoulder-r"></div>
+      </div>
+      <div class="raj-legs">
+        <div><div class="raj-leg"></div><div class="raj-shoe"></div></div>
+        <div><div class="raj-leg"></div><div class="raj-shoe"></div></div>
+      </div>
+      <div class="raj-cig"></div>
+      <div class="smoke">
+        <div class="smoke-puff"></div>
+        <div class="smoke-puff"></div>
+        <div class="smoke-puff"></div>
+      </div>
+    </div>
+    <div class="nameplate">
+      <div class="superstar-tag">★ Superstar ★</div>
+      <div class="rajini-name">RAJINIKANTH</div>
+      <div class="rajini-title">says welcome to</div>
+    </div>
+  </div>
+</div>
+<div class="panel panel-right" id="pr"></div>
+<div class="panel panel-top" id="pt"></div>
+<div class="panel panel-bottom" id="pb"></div>
+
+<!-- Impact text shown at crash moment -->
+<div id="impact-text">
+  <div class="impact-inner" id="impact-inner">
+    <div class="impact-bb">BARTERBRAIN</div>
+    <div class="impact-sub">YOUR EMPIRE AWAITS</div>
+  </div>
+</div>
+
+<!-- Lightning flash -->
+<div id="lightning"></div>
+
+<!-- Shockwave -->
+<div class="shockwave" id="shockwave"></div>
+
+<!-- Main welcome panel (after crash opens) -->
+<div id="welcome-panel">
+  <div class="welcome-card">
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+    <div class="bb-logo">◈ BarterBrain AI ◈</div>
+    <div class="welcome-greeting">Hey,</div>
+    <div class="user-name"><%= user.name %></div>
+    <div class="welcome-sub">Welcome back — your session is ready</div>
+    <div class="quote-box">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">
+        Don't be afraid of failure. Be afraid of not trying.<br>
+        Now go barter like a Superstar.
+      </div>
+      <div class="quote-attr">— Rajinikanth</div>
+    </div>
+    <div class="tips-row">
+      <div class="tip">
+        <span class="tip-icon">🔁</span>
+        <div class="tip-name">Post Skill</div>
+        <div class="tip-desc">List what you offer to attract swaps</div>
+      </div>
+      <div class="tip">
+        <span class="tip-icon">⭐</span>
+        <div class="tip-name">Build Rep</div>
+        <div class="tip-desc">Higher rep = 3× more matches</div>
+      </div>
+      <div class="tip">
+        <span class="tip-icon">💬</span>
+        <div class="tip-name">Connect</div>
+        <div class="tip-desc">Chat and negotiate your barter</div>
+      </div>
+    </div>
+    <div class="prog-label">Loading your dashboard</div>
+    <div class="prog-track"><div class="prog-fill" id="progfill"></div></div>
+  </div>
+</div>
+
+<!-- Shard canvas for particle explosion -->
+<canvas id="shardCanvas" style="position:fixed;inset:0;z-index:14;pointer-events:none;"></canvas>
+
+<script>
+/* ═══════════════════════════════════════════
+   STARFIELD + NETWORK BACKGROUND
+═══════════════════════════════════════════ */
+const bgCanvas = document.getElementById('bg');
+const bctx = bgCanvas.getContext('2d');
+function resizeBg(){bgCanvas.width=innerWidth;bgCanvas.height=innerHeight;}
+resizeBg();
+addEventListener('resize',resizeBg);
+
+const stars = Array.from({length:200},()=>({
+  x:Math.random(),y:Math.random(),
+  r:Math.random()*1.6+0.3,
+  speed:Math.random()*0.0003+0.00005,
+  opacity:Math.random()*0.7+0.2,
+  pulse:Math.random()*Math.PI*2
+}));
+const nodes = Array.from({length:32},()=>({
+  x:Math.random(),y:Math.random(),
+  vx:(Math.random()-0.5)*0.0003,
+  vy:(Math.random()-0.5)*0.0003,
+  r:Math.random()*2+1
+}));
+
+function drawBg(){
+  const W=bgCanvas.width,H=bgCanvas.height;
+  bctx.clearRect(0,0,W,H);
+  const gr=bctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W);
+  gr.addColorStop(0,'#0e0428');
+  gr.addColorStop(0.5,'#06020f');
+  gr.addColorStop(1,'#020106');
+  bctx.fillStyle=gr;bctx.fillRect(0,0,W,H);
+
+  stars.forEach(s=>{
+    s.pulse+=s.speed*60;
+    const a=s.opacity*(0.6+0.4*Math.sin(s.pulse));
+    bctx.beginPath();
+    bctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);
+    bctx.fillStyle=`rgba(210,195,255,${a})`;
+    bctx.fill();
+  });
+
+  nodes.forEach(n=>{
+    n.x+=n.vx;n.y+=n.vy;
+    if(n.x<0||n.x>1)n.vx*=-1;
+    if(n.y<0||n.y>1)n.vy*=-1;
+  });
+  for(let i=0;i<nodes.length;i++){
+    for(let j=i+1;j<nodes.length;j++){
+      const a=nodes[i],b=nodes[j];
+      const dx=(a.x-b.x)*W,dy=(a.y-b.y)*H;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<W*0.18){
+        bctx.beginPath();
+        bctx.moveTo(a.x*W,a.y*H);
+        bctx.lineTo(b.x*W,b.y*H);
+        bctx.strokeStyle=`rgba(124,58,237,${0.18*(1-d/(W*0.18))})`;
+        bctx.lineWidth=0.5;bctx.stroke();
+      }
+    }
+    bctx.beginPath();
+    bctx.arc(nodes[i].x*W,nodes[i].y*H,nodes[i].r,0,Math.PI*2);
+    bctx.fillStyle='rgba(124,58,237,0.45)';bctx.fill();
+  }
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+
+/* ═══════════════════════════════════════════
+   SHARD PARTICLE SYSTEM
+═══════════════════════════════════════════ */
+const sc=document.getElementById('shardCanvas');
+const sctx=sc.getContext('2d');
+sc.width=innerWidth;sc.height=innerHeight;
+addEventListener('resize',()=>{sc.width=innerWidth;sc.height=innerHeight;});
+
+let shards=[];
+let shardAnim=false;
+
+function spawnShards(){
+  shards=[];
+  const cx=innerWidth/2,cy=innerHeight/2;
+  const colors=['#FFD700','#FF8C00','#7c3aed','#00e5ff','#ffffff','#ff2244'];
+  for(let i=0;i<120;i++){
+    const angle=Math.random()*Math.PI*2;
+    const speed=Math.random()*18+6;
+    shards.push({
+      x:cx,y:cy,
+      vx:Math.cos(angle)*speed,
+      vy:Math.sin(angle)*speed,
+      size:Math.random()*12+3,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      alpha:1,
+      rot:Math.random()*Math.PI*2,
+      rotSpeed:(Math.random()-0.5)*0.4,
+      life:1
+    });
+  }
+  shardAnim=true;
+  animateShards();
+}
+
+function animateShards(){
+  if(!shardAnim)return;
+  sctx.clearRect(0,0,sc.width,sc.height);
+  let alive=false;
+  shards.forEach(s=>{
+    s.x+=s.vx;s.y+=s.vy;
+    s.vy+=0.35;
+    s.vx*=0.97;
+    s.life-=0.022;
+    s.alpha=Math.max(0,s.life);
+    s.rot+=s.rotSpeed;
+    if(s.alpha>0){
+      alive=true;
+      sctx.save();
+      sctx.translate(s.x,s.y);
+      sctx.rotate(s.rot);
+      sctx.globalAlpha=s.alpha;
+      sctx.fillStyle=s.color;
+      sctx.shadowBlur=10;
+      sctx.shadowColor=s.color;
+      // diamond shard shape
+      sctx.beginPath();
+      sctx.moveTo(0,-s.size);
+      sctx.lineTo(s.size*0.5,0);
+      sctx.lineTo(0,s.size*0.5);
+      sctx.lineTo(-s.size*0.5,0);
+      sctx.closePath();
+      sctx.fill();
+      sctx.restore();
+    }
+  });
+  if(alive)requestAnimationFrame(animateShards);
+  else{sctx.clearRect(0,0,sc.width,sc.height);shardAnim=false;}
+}
+
+/* ═══════════════════════════════════════════
+   LIGHTNING FLASH
+═══════════════════════════════════════════ */
+function flashLightning(){
+  const el=document.getElementById('lightning');
+  el.style.background='rgba(255,240,180,0.85)';
+  el.style.opacity='1';
+  setTimeout(()=>{el.style.transition='opacity 0.15s';el.style.opacity='0';},80);
+  setTimeout(()=>{
+    el.style.background='rgba(200,180,255,0.5)';
+    el.style.opacity='0.6';
+    setTimeout(()=>{el.style.opacity='0';},60);
+  },160);
+}
+
+/* ═══════════════════════════════════════════
+   SHOCKWAVE
+═══════════════════════════════════════════ */
+function triggerShockwave(){
+  const sw=document.getElementById('shockwave');
+  sw.style.transition='none';
+  sw.style.transform='translate(-50%,-50%) scale(0)';
+  sw.style.opacity='1';
+  sw.style.borderColor='rgba(255,215,0,0.9)';
+  requestAnimationFrame(()=>{
+    sw.style.transition='transform 0.8s ease-out, opacity 0.8s ease-out';
+    sw.style.transform='translate(-50%,-50%) scale(15)';
+    sw.style.opacity='0';
+  });
+}
+
+/* ═══════════════════════════════════════════
+   CINEMATIC SEQUENCE
+═══════════════════════════════════════════ */
+function runSequence(){
+  // Step 1: Cinematic bars open
+  document.body.classList.add('bars-open');
+
+  // Step 2 (300ms): 4 panels crash IN from all sides
+  setTimeout(()=>{
+    document.body.classList.add('crash-in');
+  },300);
+
+  // Step 3 (1300ms): IMPACT — flash + shockwave + shards + big text
+  setTimeout(()=>{
+    flashLightning();
+    triggerShockwave();
+    spawnShards();
+
+    // Show impact text
+    const it=document.getElementById('impact-text');
+    const ii=document.getElementById('impact-inner');
+    it.style.opacity='1';
+    ii.style.animation='impactPop 0.5s cubic-bezier(0.22,1,0.36,1) both';
+    // define the keyframe
+    const style=document.createElement('style');
+    style.textContent='@keyframes impactPop{0%{transform:scale(0) rotate(-5deg);opacity:0;}60%{transform:scale(1.2) rotate(2deg);}100%{transform:scale(1) rotate(0);opacity:1;}}';
+    document.head.appendChild(style);
+
+  },1300);
+
+  // Step 4 (2000ms): hold the BARTERBRAIN impact
+
+  // Step 5 (2600ms): panels explode OUT + impact fades
+  setTimeout(()=>{
+    document.body.classList.remove('crash-in');
+    document.body.classList.add('crash-out');
+    document.getElementById('impact-text').style.transition='opacity 0.4s';
+    document.getElementById('impact-text').style.opacity='0';
+    spawnShards(); // second burst
+    flashLightning();
+  },2600);
+
+  // Step 6 (3300ms): welcome panel fades in
+  setTimeout(()=>{
+    document.getElementById('welcome-panel').classList.add('visible');
+  },3300);
+
+  // Step 7 (6500ms): redirect
+  setTimeout(()=>{
+    window.location.href='/dashboard';
+  },6500);
+}
+
+// Kick off after fonts load
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(()=>setTimeout(runSequence,200));
+}else{
+  setTimeout(runSequence,400);
+}
+</script>
+</body>
+</html>
